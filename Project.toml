@@ -1,0 +1,13 @@
+name = "MegTools"
+uuid = "288cda28-4ae6-481c-bed1-a20b56f172b1"
+authors = ["Asim H. Dar"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
