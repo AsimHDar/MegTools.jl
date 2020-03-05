@@ -16,5 +16,9 @@ include("IO_mat.jl")
 
 
 
+<<<<<<< HEAD
+=======
+end
+>>>>>>> 7c4808ba45fd86624e18e0542b1dcc26dcac548a
 
 end # module
