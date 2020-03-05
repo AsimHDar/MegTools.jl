@@ -2,9 +2,10 @@ using MegTools
 using Test
 
 
-@testset "IO.jl" begin
+@testset "IO_Meg.jl" begin
     # Write your own tests here.
-    a = load_cont_epochs("test/testData/test_data.mat")
+    test_data = joinpath(@__DIR__, "testData", "test_data.mat")
+    a = load_cont_epochs(test_data)
     @test a isa Dict
     @test length(collect(keys(a))) == 4
     for condition in collect(keys(a))
