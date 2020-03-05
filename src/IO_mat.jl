@@ -5,7 +5,6 @@ using NamedDims
 using Plots
 using Statistics
 
-plotly()
 
 function load_cont_epochs(path)
 
