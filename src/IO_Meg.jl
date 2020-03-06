@@ -5,11 +5,19 @@ using NamedDims
 using Plots
 using Statistics
 
+"""
+    load_cont_epochs(file_name)
 
-function load_cont_epochs(path)
+Produces a dictionary of arrays (using AxisRange and NamedDims), based on the different
+conditions classified from the input .mat file. The input .mat file is produced from the
+BESA®-MATLAB® interface when the "Epochs around triggers" option is selected.
+
+Each array has the following format: [time(ms), channels, trials]
+
+"""
+function load_cont_epochs(file_name)
 
 ## Loading the data of all epochs
-cont_epochs = matread(path)
 cont_epochs = cont_epochs["besa_channels"]
 all_epochs  = cont_epochs["data"]["amplitudes"]
 
