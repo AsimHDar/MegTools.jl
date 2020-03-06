@@ -18,6 +18,7 @@ Each array has the following format: [time(ms), channels, trials]
 function load_cont_epochs(file_name)
 
 ## Loading the data of all epochs
+cont_epochs = matread(path)
 cont_epochs = cont_epochs["besa_channels"]
 all_epochs  = cont_epochs["data"]["amplitudes"]
 
