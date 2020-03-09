@@ -1,4 +1,5 @@
 using AxisRanges
+using Base.Threads
 using LinearAlgebra
 using MAT
 using NamedDims
@@ -16,9 +17,8 @@ Each array has the following format: [time(ms), channels, trials]
 
 """
 function load_cont_epochs(file_name)
-
 ## Loading the data of all epochs
-cont_epochs = matread(path)
+cont_epochs = matread(file_name)
 cont_epochs = cont_epochs["besa_channels"]
 all_epochs  = cont_epochs["data"]["amplitudes"]
 
@@ -38,7 +38,8 @@ end
 stacked_conditions = Array{String,1}(undef, length(all_epochs))
 
 # Going through all epochs to determine the type of event at t=0
-for epoch = 1:length(all_epochs)
+
+@threads for epoch = 1:length(all_epochs)
     # determine index at t=0 in each event
     epoch_latencies  = cont_epochs["data"]["event"][epoch]["latency"]
 
@@ -51,6 +52,7 @@ for epoch = 1:length(all_epochs)
     # Get the condition label/trigger at t=0
     stacked_conditions[epoch]=string(cont_epochs["data"]["event"][epoch]["label"][t_zero][1])
 end
+
 
 # Getting all the different conditions and their counts so they can be nested (under a subject)
 # by name. The count is so that we can preallocate the number of trials
@@ -70,7 +72,7 @@ for (condition,unique_count) in unique_counts
 end
 
 
-for condition in unique_conditions
+@threads for condition in unique_conditions
 
 
     for epoch = 1:length(unique_counts[condition])
