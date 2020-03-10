@@ -1,5 +1,4 @@
 using AxisRanges
-using Base.Threads
 using LinearAlgebra
 using MAT
 using NamedDims
@@ -39,7 +38,7 @@ stacked_conditions = Array{String,1}(undef, length(all_epochs))
 
 # Going through all epochs to determine the type of event at t=0
 
-@threads for epoch = 1:length(all_epochs)
+for epoch = 1:length(all_epochs)
     # determine index at t=0 in each event
     epoch_latencies  = cont_epochs["data"]["event"][epoch]["latency"]
 
@@ -52,7 +51,6 @@ stacked_conditions = Array{String,1}(undef, length(all_epochs))
     # Get the condition label/trigger at t=0
     stacked_conditions[epoch]=string(cont_epochs["data"]["event"][epoch]["label"][t_zero][1])
 end
-
 
 # Getting all the different conditions and their counts so they can be nested (under a subject)
 # by name. The count is so that we can preallocate the number of trials
@@ -70,9 +68,7 @@ stacked_epochs = Dict()
 for (condition,unique_count) in unique_counts
     stacked_epochs[condition] = Array{Float64,3}(undef,epoch_dims[1],epoch_dims[2],unique_count )
 end
-
-
-@threads for condition in unique_conditions
+for condition in unique_conditions
 
 
     for epoch = 1:length(unique_counts[condition])
