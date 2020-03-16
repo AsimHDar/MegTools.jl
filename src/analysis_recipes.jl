@@ -1,3 +1,7 @@
+using Statistics
+
+
+
 """
     average_across_trials(all_epochs)
 
@@ -67,5 +71,58 @@ function select_channels(data; paradigm::String="auditoryN1m")
     selected_data = data(channels= vcat(left_hem_channels, right_hem_channels))
 
     return selected_data, left_hem_channels, right_hem_channels
+
+end
+
+"""
+    baseline_correction(data; baseline_range=(-200,0))
+
+Baseline correct data (single channel or multiple channels) based on the specified range
+(default is -200 < t < 0)
+
+Returns baseline corrected data (single channel or multiple channels)
+"""
+function baseline_correction(data; baseline_range=(-200, 0))
+
+    baseline_latency_range = t-> baseline_range[1] < t < baseline_range[2]
+    baseline = mean(data(time = baseline_latency_range), dims=1)
+    filt_baseline_corrected_data = data .- baseline
+
+    return filt_baseline_corrected_data
+
+end
+
+"""
+
+    find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
+
+Finds the channels containing peak values (for left and right hemisphere data sets). Channels
+of interest are passed into left_hem_channels and right_hem_channels as Symbols. The
+latency window for evaluating the peak values can be set with peak_range (default is set
+to 50 < t <150)
+
+Returns the left and right peak erfs and their respective channel labels in the following
+format: left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right
+"""
+function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
+
+    N1m_latency_range = t -> peak_range[1] < t < peak_range[2]
+    # Left ERF
+    # Find index of peak value
+    left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
+    _,left_peak = findmax(left_channels)
+    # Determine channel name from index and use it to extract relevent channel data
+    peak_channel_left= left_channels.channels[left_peak[2]]
+    left_peak_erf = data(channels = peak_channel_left)
+
+    # Right ERF
+    right_channels = data(channels = right_hem_channels, time = N1m_latency_range)
+    # Right side activity is negative, and so minimum is the "peak" value
+    _,right_peak = findmin(right_channels)
+    peak_channel_right= right_channels.channels[left_peak[2]]
+    # Polarity is fliped to view in the positive of the y-axis
+    right_peak_erf = -data(channels = peak_channel_right)
+
+    return left_peak_erf, right_peak_erf, peak_channel_left, peak_channel_right
 
 end

@@ -1,11 +1,10 @@
 module MegTools
 
-using AxisRanges
+using AxisKeys
 using LinearAlgebra
 using MAT
 using Measures
 using NamedDims
-using Plots
 using Statistics
 
 # Paths are based on where this module is
@@ -16,6 +15,13 @@ using Statistics
 include("IO_Meg.jl")
 export load_cont_epochs
 
+include("analysis_recipes.jl")
+export average_across_trials, select_channels, baseline_correction, find_peaks
 
 
-end # module
+include("filters.jl")
+export highlow_butterworth_filter
+
+
+
+end
