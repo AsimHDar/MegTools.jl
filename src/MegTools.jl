@@ -3,6 +3,7 @@ module MegTools
 using AxisRanges
 using LinearAlgebra
 using MAT
+using Measures
 using NamedDims
 using Plots
 using Statistics
