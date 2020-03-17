@@ -5,6 +5,9 @@ makedocs(;
     format=Documenter.HTML(),
     pages=[
         "Home" => "index.md",
+        "DocStrings" => "functions.md",
+        "Simple Pipeline" => "pipelines/testingpreproc.md",
+
     ],
     repo="https://github.com/ElectronicTeaCup/MegTools.jl/blob/{commit}{path}#L{line}",
     sitename="MegTools.jl",
@@ -15,3 +18,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/ElectronicTeaCup/MegTools.jl",
 )
+
+    
