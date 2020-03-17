@@ -52,12 +52,12 @@ end
     @test ndims(b) == 1
     @test length(b) == length(averaged_trials[:,1])
     # Testing will all averaged_trials
-    a,b,c,d = find_peaks(
+    #=TODO? a,b,c,d = find_peaks(
         highlow_butterworth_filter(test_data["1"], 1000),
         left_labels,
         right_labels
     )
-    
+    =#
 
 end
 

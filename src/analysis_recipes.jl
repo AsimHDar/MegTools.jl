@@ -96,15 +96,26 @@ end
 
     find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
 
-Finds the channels containing peak values (for left and right hemisphere data sets). Channels
-of interest are passed into left_hem_channels and right_hem_channels as Symbols. The
-latency window for evaluating the peak values can be set with peak_range (default is set
-to 50 < t <150)
+Finds the channels containing peak values (for left and right hemisphere data sets) in
+averaged data. Channels of interest are passed into left_hem_channels and right_hem_channels
+as Symbols. The latency window for evaluating the peak values can be set with peak_range
+(default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels in the following
 format: left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right
 """
 function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
+    # Making sure input dimentions are limited to 2 (channels and time)
+    if ndims(data) > 2
+        if size(data)[3] > 1
+            @error "Dimentions more than 2, average this data first."
+            return
+        elseif ndims(data) > 3
+            @error "Dimentions more than 3."
+            return
+        end
+    end
+
 
     N1m_latency_range = t -> peak_range[1] < t < peak_range[2]
     # Left ERF
