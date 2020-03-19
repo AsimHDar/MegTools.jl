@@ -5,7 +5,7 @@ using Statistics
 """
     average_across_trials(all_epochs)
 
-Returns the averaged signal across trials of a single condition (e.g. Sub09["1"]).
+Returns the averaged signal across trials of a single condition (e.g. `Sub09["1"]` ).
 """
 function average_across_trials(all_epochs)
 
@@ -39,7 +39,7 @@ Select specific channels of interest to be processed for analysis. It selects
 channel names based on the available paradigms and returns data from channels, as well as
 the labels of the channels. The default paradigm is set to auditoryN1m.
 
-Returns in the following format: selected_data, left_hem_channels, right_hem_channels
+Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
 function select_channels(data; paradigm::String="auditoryN1m")
 # This paradigm selects channels based on the ones that appear most active during auditory
@@ -96,13 +96,13 @@ Data contains all conditions and is a Dict (subject). Select specific channels o
 channel names based on the available paradigms and returns data from channels, as well as
 the labels of the channels. The default paradigm is set to auditoryN1m.
 
-Returns in the following format: selected_data, left_hem_channels, right_hem_channels
+Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
 function select_channels(data::Dict; paradigm::String="auditoryN1m")
 
     select_ch = Dict()
     local left_hem_channels
-    local right_hem_channels 
+    local right_hem_channels
     for (condition, cond_data) in data
         select_ch[condition], left_hem_channels, right_hem_channels = select_channels(
             cond_data,
@@ -163,7 +163,7 @@ as Symbols. The latency window for evaluating the peak values can be set with pe
 (default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels in the following
-format: left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right
+format: `left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right`
 """
 function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
     # Making sure input dimentions are limited to 2 (channels and time)
@@ -209,7 +209,7 @@ as Symbols. The latency window for evaluating the peak values can be set with pe
 (default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels in the following
-format: left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right
+format: `left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right`
 """
 function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
 

@@ -44,7 +44,7 @@ threshold values for filters, change add keyword arguments low_pass for low pass
 (default=30) and high_pass for high-pass cut-off (default=1). To change the nth order
 of the butterworth filter, use keyword bw_n_pole (default=5).
 
-Returns filtered data
+Returns filtered data as a Dict
 """
 function highlow_butterworth_filter(
     data::Dict, sampling_rate;
