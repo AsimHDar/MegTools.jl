@@ -16,11 +16,14 @@ include("IO_Meg.jl")
 export load_cont_epochs
 
 include("analysis_recipes.jl")
-export average_across_trials, select_channels, baseline_correction, find_peaks
+export average_across_trials, select_channels, baseline_correction, find_peaks, collect_peaks
 
 
 include("filters.jl")
 export highlow_butterworth_filter
+
+include("trigger_keys.jl")
+export load_trigger_values
 
 
 

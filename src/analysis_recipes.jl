@@ -191,8 +191,10 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     right_channels = data(channels = right_hem_channels, time = N1m_latency_range)
     # Right side activity is negative, and so minimum is the "peak" value
     right_peak_value,right_peak_idx = findmin(right_channels)
+    # Reversing polarity on right channel value
+    right_peak_value = abs(right_peak_value)
     peak_channel_right= right_channels.channels[left_peak_idx[2]]
-    # Polarity is fliped to view in the positive of the y-axis
+    # Polarity is flipped to view in the positive of the y-axis
     right_peak_erf = -data(channels = peak_channel_right)
 
     return left_peak_erf, left_peak_value, right_peak_erf, right_peak_value, peak_channel_left, peak_channel_right
@@ -219,7 +221,7 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_rang
     for (condition, cond_data) in data
         left_peak_erf,
         left_peak_value,
-        right_peak_erf, 
+        right_peak_erf,
         right_peak_value,
         peak_channel_left,
         peak_channel_right = find_peaks(
@@ -239,4 +241,33 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_rang
 
     return peaks
 
+end
+
+"""
+
+    collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
+
+Collects the peaks (the maximum value) of the left and right ERF of all conditions present
+in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
+by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
+trigger values.
+
+Returns in the following format: `soi, left_amps, right_amps`
+"""
+function collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
+    soi, left_amps, right_amps = [], [], []
+    for (condition,value) in peaks
+        push!(soi, cond_vals[condition])
+        push!(left_amps,value["left_peak_value"])
+        push!(right_amps,value["right_peak_value"])
+
+    end
+
+    # Sorting the output so that a line can be made from the plots
+    soi_idx = sortperm(soi)
+    soi = soi[soi_idx]
+    left_amps  = left_amps[soi_idx]
+    right_amps = right_amps[soi_idx]
+
+    return soi, left_amps, right_amps
 end
