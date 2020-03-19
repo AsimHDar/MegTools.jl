@@ -63,7 +63,7 @@ end
     baseline_corrected_1 = baseline_correction(not_filtered_1)
     @test baseline_corrected[:,:,1] == baseline_corrected_1
     # Testing find find_peaks
-    a,b,c,d = find_peaks(averaged_trials, left_labels, right_labels)
+    a,_,b,_,c,d = find_peaks(averaged_trials, left_labels, right_labels)
     @test ndims(a) == 1
     @test length(a) == length(averaged_trials[:,1])
     @test ndims(b) == 1

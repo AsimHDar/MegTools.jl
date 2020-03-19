@@ -124,7 +124,7 @@ plot!(
 And finally finding peaks in both left and right sets of channels
 
 ````julia
-a,b,c,d = find_peaks(baseline_corrected, auditory_left, auditory_right)
+a,_,b,_,c,d = find_peaks(baseline_corrected, auditory_left, auditory_right)
 
 # Takinga look at all the channels with marked peak values
 channel_plots = plot(layout=(9,3), size = (1000,3000), margin=5mm, legend=false, ticks=[])

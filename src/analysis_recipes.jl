@@ -182,20 +182,20 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     # Left ERF
     # Find index of peak value
     left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
-    _,left_peak = findmax(left_channels)
+    left_peak_value,left_peak_idx = findmax(left_channels)
     # Determine channel name from index and use it to extract relevent channel data
-    peak_channel_left= left_channels.channels[left_peak[2]]
+    peak_channel_left= left_channels.channels[left_peak_idx[2]]
     left_peak_erf = data(channels = peak_channel_left)
 
     # Right ERF
     right_channels = data(channels = right_hem_channels, time = N1m_latency_range)
     # Right side activity is negative, and so minimum is the "peak" value
-    _,right_peak = findmin(right_channels)
-    peak_channel_right= right_channels.channels[left_peak[2]]
+    right_peak_value,right_peak_idx = findmin(right_channels)
+    peak_channel_right= right_channels.channels[left_peak_idx[2]]
     # Polarity is fliped to view in the positive of the y-axis
     right_peak_erf = -data(channels = peak_channel_right)
 
-    return left_peak_erf, right_peak_erf, peak_channel_left, peak_channel_right
+    return left_peak_erf, left_peak_value, right_peak_erf, right_peak_value, peak_channel_left, peak_channel_right
 
 end
 
@@ -209,15 +209,20 @@ as Symbols. The latency window for evaluating the peak values can be set with pe
 (default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels as a Dict
-with the following entires: `["left_peak_erf"], ["right_peak_erf"], ["left_channel_label"],
-["right_channel_label"] `
+with the following entires: `["left_peak_erf"],["left_peak_value"], ["right_peak_erf"],
+["right_peak_value"], ["left_channel_label"], ["right_channel_label"] `
 
 """
 function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
 
     peaks = Dict()
     for (condition, cond_data) in data
-        left_peak_erf, right_peak_erf, peak_channel_left, peak_channel_right = find_peaks(
+        left_peak_erf,
+        left_peak_value,
+        right_peak_erf, 
+        right_peak_value,
+        peak_channel_left,
+        peak_channel_right = find_peaks(
             cond_data,
             left_hem_channels,
             right_hem_channels,
@@ -225,7 +230,9 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_rang
         )
         peaks[condition] = Dict()
         peaks[condition]["left_peak_erf"]  = left_peak_erf
+        peaks[condition]["left_peak_value"]  = left_peak_value
         peaks[condition]["right_peak_erf"] = right_peak_erf
+        peaks[condition]["right_peak_value"]  = right_peak_value
         peaks[condition]["left_channel_label"]  = peak_channel_left
         peaks[condition]["right_channel_label"] = peak_channel_right
     end
