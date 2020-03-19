@@ -20,6 +20,12 @@ end
     averaged_trials = average_across_trials(test_data["1"])
     @test ndims(averaged_trials) == 2
     @test size(test_data["1"])[1:2] == size(averaged_trials)
+    # Subject (Dict) test
+    subject_av = average_across_trials(test_data)
+    @test  subject_av isa Dict
+    @test ndims(subject_av["1"]) == 2
+    @test size(test_data["1"])[1:2] == size(subject_av["1"])
+
     # Testing single condition, select_channels
     auditory_channels,left_labels,right_labels = select_channels(
         test_data["1"],
@@ -27,6 +33,13 @@ end
     )
     @test size(auditory_channels)[2] ==  (length(left_labels) + length(right_labels))
     @test auditory_channels.channels == vcat(left_labels, right_labels)
+    # Select from subject (Dict)
+    auditory_channels,left_labels,right_labels = select_channels(
+        test_data,
+        paradigm="auditoryN1m",
+    )
+    @test size(auditory_channels["1"])[2] ==  (length(left_labels) + length(right_labels))
+    @test auditory_channels["1"].channels == vcat(left_labels, right_labels)
     # Same with averaged trial, which is of a single condition
     auditory_channels,left_labels,right_labels = select_channels(
         averaged_trials,
@@ -39,6 +52,10 @@ end
     baseline_corrected = baseline_correction(filtered)
     @test filtered ≠ baseline_corrected
     @test sum(baseline_corrected) < sum(filtered)
+    # Single subject (Dict)
+    baseline_corrected = baseline_correction(test_data)
+    @test test_data["1"] ≠ baseline_corrected["1"]
+    @test sum(baseline_corrected["1"]) < sum(test_data["1"])
     # Determine if robust with different number of total trials
     not_filtered =  test_data["1"]
     baseline_corrected = baseline_correction(not_filtered)
@@ -51,6 +68,13 @@ end
     @test length(a) == length(averaged_trials[:,1])
     @test ndims(b) == 1
     @test length(b) == length(averaged_trials[:,1])
+    # Single subject (Dict)
+    subpeaks = find_peaks(subject_av, left_labels, right_labels)
+    @test ndims(subpeaks["1"]["left_peak_erf"]) == 1
+    @test length(subpeaks["1"]["left_peak_erf"]) == length(subject_av["1"][:,1])
+    @test ndims(subpeaks["1"]["right_peak_erf"]) == 1
+    @test length(subpeaks["1"]["right_peak_erf"]) == length(subject_av["1"][:,1])
+
     # Testing will all averaged_trials
     #=TODO? a,b,c,d = find_peaks(
         highlow_butterworth_filter(test_data["1"], 1000),
@@ -72,5 +96,16 @@ end
     @test filtered ≠ auditory_channels
     @test size(filtered) == size(auditory_channels)
     @test filtered.channels == vcat(left_labels, right_labels)
+    # Subject (Dict)
+    subject_av = average_across_trials(test_data)
+    auditory_channels,left_labels,right_labels = select_channels(
+        subject_av,
+        paradigm="auditoryN1m",
+    )
+    filtered = highlow_butterworth_filter(auditory_channels, 1000)
+    for (cond, data) in filtered
+        @test filtered[cond]  ≠ auditory_channels[cond] && size(filtered[cond]) == size(auditory_channels[cond])
+        @test filtered[cond].channels == vcat(left_labels, right_labels)
+    end
 
 end

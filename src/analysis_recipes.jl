@@ -208,8 +208,10 @@ Data contains all conditions and is a Dict (subject). Finds the channels contain
 as Symbols. The latency window for evaluating the peak values can be set with peak_range
 (default is set to 50 < t <150)
 
-Returns the left and right peak erfs and their respective channel labels in the following
-format: `left_peak_erf right_peak_erf, peak_channel_left, peak_channel_right`
+Returns the left and right peak erfs and their respective channel labels as a Dict
+with the following entires: `["left_peak_erf"], ["right_peak_erf"], ["left_channel_label"],
+["right_channel_label"] `
+
 """
 function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
 
