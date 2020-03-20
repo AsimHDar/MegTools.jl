@@ -257,7 +257,7 @@ Returns in the following format: `soi, left_amps, right_amps`
 function collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
     soi, left_amps, right_amps = [], [], []
     for (condition,value) in peaks
-        push!(soi, value[condition])
+        push!(soi, cond_trigger_vals[condition])
         push!(left_amps, value["left_peak_value"])
         push!(right_amps, value["right_peak_value"])
 
