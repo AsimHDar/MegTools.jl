@@ -114,3 +114,15 @@ end
     end
 
 end
+
+
+@testset "trigger_keys.jl" begin
+    triggers = load_trigger_values("regsoi")
+    @test triggers isa Dict
+    @test length(triggers) == 20
+    try
+        load_trigger_values("MyUnknownProject")
+    catch
+        @test 1==1 #statating that an error is occuring
+    end
+end
