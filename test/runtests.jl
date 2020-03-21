@@ -74,6 +74,11 @@ end
     @test length(subpeaks["1"]["left_peak_erf"]) == length(subject_av["1"][:,1])
     @test ndims(subpeaks["1"]["right_peak_erf"]) == 1
     @test length(subpeaks["1"]["right_peak_erf"]) == length(subject_av["1"][:,1])
+    sois, left, right = collect_peaks(subpeaks)
+    @test length(sois) ==  length(left) ==  length(right)
+    @test typeof(sois[1]) == Float64
+
+
 
     # Testing will all averaged_trials
     #=TODO? a,b,c,d = find_peaks(
