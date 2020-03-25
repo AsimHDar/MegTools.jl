@@ -1,17 +1,27 @@
 using MegTools
 using Test
 
+# BESA epoch data
 test_path = joinpath(@__DIR__, "testData", "test_data.mat")
 test_data = load_cont_epochs(test_path)
-
+# Brainstorm epoch data_path
+BStest_path = joinpath(@__DIR__, "testData", "sub_001")
+BStest_data = load_BSepochs(BStest_path)
 
 @testset "IO_Meg.jl" begin
-    # Write your own tests here.
+    # Testing BESA output
     @test test_data isa Dict
     @test length(collect(keys(test_data))) == 4
     for condition in collect(keys(test_data))
-        @test size(test_data[condition])==(1501, 319, 100)
+        @test size(test_data[condition])==(1501, 319, 100)  # Time, Channels, Trials
     end
+    # Testing Brainstorm outputs
+    @test BStest_data isa Dict
+    @test length(collect(keys(BStest_data))) == 2 # There are only 2 conditions
+    for condition in collect(keys(BStest_data))
+        @test size(BStest_data[condition])==(1501, 351, 2)  # Time, Channels, Trials
+    end
+
 end
 
 @testset "analysis_recipes.jl" begin
