@@ -13,7 +13,7 @@ using Statistics
 # E.g. include("../scripts/ReadContEps.jl")
 
 include("IO_Meg.jl")
-export load_cont_epochs
+export load_cont_epochs, load_BSepochs
 
 include("analysis_recipes.jl")
 export average_across_trials, select_channels, baseline_correction, find_peaks, collect_peaks
