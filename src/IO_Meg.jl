@@ -124,7 +124,7 @@ function load_BSepochs(subject::String)
 
     # Switch working directory to the location of the subjects data
     # TODO: Correct to actual file structure as designated by Brainstorm
-    data_path =joinpath(pwd(),subject)
+    data_path = joinpath(pwd(), subject)
     cd(data_path)
 
     # Collecting all unique conditions present
@@ -134,11 +134,11 @@ function load_BSepochs(subject::String)
     channel_labels = matread("channel_vectorview306_acc1.mat")["Channel"]["Name"]
 
     # Getting epoch files
-    epoch_files = filter(x->x[1:4] == "data", dir_contents)
-    epoch_conditions = Vector{String}(undef,length(epoch_files))
+    epoch_files = filter(x -> x[1:4] == "data", dir_contents)
+    epoch_conditions = Vector{String}(undef, length(epoch_files))
     for (idx, file) in enumerate(epoch_files)
 
-        condition = split(file,"_")[2] # Get condition label
+        condition = split(file, "_")[2] # Get condition label
         epoch_conditions[idx] = condition
     end
 
@@ -170,7 +170,7 @@ function load_BSepochs(subject::String)
            stacked_epochs,
            # Time is converted to ms (from seconds) and rounded to 5 sig digits
            time = round.(trial_full["Time"][:] * 1000, digits = 5),
-           channels = dropdims(Symbol.(channel_labels),dims=1),
+           channels = dropdims(Symbol.(channel_labels), dims=1),
            trials = 1:n_trials,
            )
 
