@@ -178,7 +178,8 @@ channel_plots
 
 ![](figures/testingpreproc_6_1.png)
 
-#Pipeline with single subject (all conditions)
+# Pipeline with single subject (all conditions)
+Loading the data we need. This time an entire subject is selected, rather than a single condition.
 
 ````julia
 using Plots
