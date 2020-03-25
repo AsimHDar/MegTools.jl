@@ -177,3 +177,136 @@ channel_plots
 
 
 ![](figures/testingpreproc_6_1.png)
+
+#Pipeline with single subject (all conditions)
+
+````julia
+using Plots
+gr()
+using Measures
+using MegTools
+test = load_cont_epochs("condEpoch.mat")
+
+test_average = average_across_trials(test)
+````
+
+
+````
+Dict{Any,Any} with 4 entries:
+  "4" => [-10.4638 -2.82368 … -0.345707 0.0; -10.8853 -4.47701 … -0.441074
+0.0;…
+  "1" => [-5.28188 -6.96084 … -0.345707 0.0; -3.12151 -9.73671 … -0.393391
+0.0;…
+  "2" => [2.56249 21.5772 … -0.417233 0.0; 3.12303 19.4094 … -0.405312 0.0;
+ … ;…
+  "3" => [-8.77625 -1.33373 … -0.357628 0.0; -6.94149 -3.89193 … -0.369549
+0.0;…
+````
+
+
+
+
+Getting the averages of all conditions
+
+````julia
+test_average_auditory,auditory_left,auditory_right = select_channels(
+    test_average,
+    paradigm="auditoryN1m",
+)
+
+avs = plot(layout=(4,1), size=(1000,1000))
+for (cond,val) in test_average_auditory
+    plot!(avs, test_average_auditory[cond], legend=false)
+end
+
+avs
+````
+
+
+![](figures/testingsubjectAnalysis_2_1.png)
+
+
+Filtering and baseline correcting
+
+````julia
+filtered = highlow_butterworth_filter(test_average_auditory, 1000)
+baseline_corrected = baseline_correction(filtered)
+
+peaks = find_peaks(baseline_corrected, auditory_left, auditory_right)
+````
+
+
+````
+Dict{Any,Any} with 4 entries:
+  "4" => Dict{Any,Any}("right_channel_label"=>:MEG2221,"left_peak_value"=>2
+49.1…
+  "1" => Dict{Any,Any}("right_channel_label"=>:MEG2611,"left_peak_value"=>9
+1.75…
+  "2" => Dict{Any,Any}("right_channel_label"=>:MEG2221,"left_peak_value"=>1
+67.5…
+  "3" => Dict{Any,Any}("right_channel_label"=>:MEG2221,"left_peak_value"=>2
+22.7…
+````
+
+
+
+
+Loading trigger values from labels
+
+````julia
+cond_trigger_vals = load_trigger_values("regsoi")
+````
+
+
+````
+Dict{String,Any} with 20 entries:
+  "4"  => 0.5
+  "1"  => 1.0
+  "12" => 1.4
+  "20" => "Noise"
+  "2"  => 0.3
+  "6"  => 0.7
+  "11" => 1.3
+  "13" => 1.5
+  "5"  => 0.6
+  "15" => 1.7
+  "16" => 1.8
+  "14" => 1.6
+  "7"  => 0.8
+  "8"  => 0.9
+  "17" => 1.9
+  "10" => 1.2
+  "19" => 1.001
+  "9"  => 1.1
+  "18" => 2.0
+  "3"  => 0.4
+````
+
+
+
+
+For this specific analysis I need the peaks from all averaged and preprocecced ERFS
+
+````julia
+soi, left_amps, right_amps = collect_peaks(peaks)
+````
+
+
+````
+(Any[0.3, 0.4, 0.5, 1.0], Any[167.54163255378427, 222.76169962748236, 249.1
+7313020699214, 91.75092170883264], Any[164.4568309644351, 227.3254603109246
+3, 244.7908937654169, 120.45757339145912])
+````
+
+
+
+
+Plotting peaks that we got
+
+````julia
+scatter(soi,left_amps, label="Left peak amplitudes");
+scatter!(soi,right_amps, label="Right peak amplitudes")
+````
+
+
+![](figures/testingsubjectAnalysis_6_1.png)
