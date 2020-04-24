@@ -132,6 +132,9 @@ function load_BSepochs(subject_path::String)
     # Getting channel Data
     channel_labels = matread("channel_vectorview306_acc1.mat")["Channel"]["Name"]
 
+    # Getting names of bad trials
+    bad_trials = matread("brainstormstudy.mat")["BadTrials"]
+
     # Getting epoch files
     epoch_files = filter(x -> x[1:4] == "data", dir_contents)
     epoch_conditions = Vector{String}(undef, length(epoch_files))
@@ -154,13 +157,19 @@ function load_BSepochs(subject_path::String)
         one_trial = trial_full["F"]' # Reading signal data to get expected dimentions
         total_timepoints = size(one_trial, 1)
         n_channels = size(one_trial, 2)
-        n_trials = length(to_read)
+        # Removing bad trials
+        n_trials = length(to_read) - length(intersect(bad_trials, to_read))
         stacked_epochs = Array{Float64}(undef, total_timepoints, n_channels, n_trials)
 
         # Bundling together all the trials in a single array
         for (idx, trial) in enumerate(to_read)
 
-            stacked_epochs[:,:,idx] =  matread(to_read[idx])["F"]' # F is the label given to the data
+            if trial ∈ bad_trials  # Go to next trial if it belongs to the bad trials list
+                continue
+            end
+
+            trial_data = matread(trial)["F"]' # F is the label given to the data
+            stacked_epochs[:,:,idx] = trial_data
 
         end
 

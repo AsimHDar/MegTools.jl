@@ -19,8 +19,10 @@ BStest_data = load_BSepochs(BStest_path)
     @test BStest_data isa Dict
     @test length(collect(keys(BStest_data))) == 2 # There are only 2 conditions
     for condition in collect(keys(BStest_data))
+        # In condition "7" one trial is rejected (005- as labelled in brainstormstudy.mat)
         @test size(BStest_data[condition])==(1501, 351, 2)  # Time, Channels, Trials
     end
+
 
 end
 
