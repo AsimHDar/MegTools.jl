@@ -6,9 +6,41 @@ using Plots
 using Statistics
 
 """
+    load_besa_av(file_name)
+
+Produces a dictionary of arrays (using AxisKeys and NamedDims), based on the input .mat file
+of a single average. The input .mat file is produced from the BESA®-MATLAB® interface and
+then saved as a separate .mat file containing the average of a single condition.
+
+Each array has the following format: [time(ms), channels]
+
+"""
+function load_besa_av(file_name)
+    ## Loading the data of all epochs
+    data_file = matread(file_name)
+    dict_content = collect(keys(data_file))
+    if length(dict_content) > 1
+        error("Contents of file contain more than a single struct")
+        return
+    end
+
+    data = data_file[dict_content[1]]
+    averaged_data  = data["data"]["amplitudes"]
+
+    averaged_data_array= wrapdims(
+       averaged_data,
+       time = dropdims(data["data"]["latencies"],dims=1),
+       channels = dropdims(Symbol.(data["channellabels"]),dims=1),
+       )
+
+    return averaged_data_array
+
+end
+
+"""
     load_cont_epochs(file_name)
 
-Produces a dictionary of arrays (using AxisRange and NamedDims), based on the different
+Produces a dictionary of arrays (using AxisKeys and NamedDims), based on the different
 conditions classified from the input .mat file. The input .mat file is produced from the
 BESA®-MATLAB® interface when the "Epochs around triggers" option is selected.
 

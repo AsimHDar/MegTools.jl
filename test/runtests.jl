@@ -1,12 +1,18 @@
 using MegTools
+using AxisKeys
 using Test
 
 # BESA epoch data
 test_path = joinpath(@__DIR__, "testData", "test_data.mat")
 test_data = load_cont_epochs(test_path)
+
+# BESA averaged data
+BESA_av = joinpath(@__DIR__, "testData", "besa_av_singlecondition.mat")
+BESA_av_data = load_besa_av(BESA_av)
 # Brainstorm epoch data_path
 BStest_path = joinpath(@__DIR__, "testData", "sub_001")
 BStest_data = load_BSepochs(BStest_path)
+
 
 @testset "IO_Meg.jl" begin
     # Testing BESA output
@@ -15,6 +21,9 @@ BStest_data = load_BSepochs(BStest_path)
     for condition in collect(keys(test_data))
         @test size(test_data[condition])==(1501, 319, 100)  # Time, Channels, Trials
     end
+    # Loading average
+    @test BESA_av_data isa KeyedArray
+
     # Testing Brainstorm outputs
     @test BStest_data isa Dict
     @test length(collect(keys(BStest_data))) == 2 # There are only 2 conditions
