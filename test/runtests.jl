@@ -1,4 +1,5 @@
 using MegTools
+using AxisKeys
 using Test
 
 # BESA epoch data
@@ -22,7 +23,7 @@ BStest_data = load_BSepochs(BStest_path)
     end
     # Loading average
     @test BESA_av_data isa KeyedArray
-    
+
     # Testing Brainstorm outputs
     @test BStest_data isa Dict
     @test length(collect(keys(BStest_data))) == 2 # There are only 2 conditions
