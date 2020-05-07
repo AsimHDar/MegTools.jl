@@ -16,24 +16,24 @@ Each array has the following format: [time(ms), channels]
 
 """
 function load_besa_av(file_name)
-## Loading the data of all epochs
-data_file = matread(file_name)
-dict_content = collect(keys(data_file))
-if length(dict_content) > 1
-    error("Contents of file contain more than a single struct")
-    return
-end
+    ## Loading the data of all epochs
+    data_file = matread(file_name)
+    dict_content = collect(keys(data_file))
+    if length(dict_content) > 1
+        error("Contents of file contain more than a single struct")
+        return
+    end
 
-data = data_file[dict_content[1]]
-averaged_data  = data["data"]["amplitudes"]
+    data = data_file[dict_content[1]]
+    averaged_data  = data["data"]["amplitudes"]
 
-averaged_data_array= wrapdims(
-   averaged_data,
-   time = dropdims(data["data"]["latencies"],dims=1),
-   channels = dropdims(Symbol.(data["channellabels"]),dims=1),
-   )
+    averaged_data_array= wrapdims(
+       averaged_data,
+       time = dropdims(data["data"]["latencies"],dims=1),
+       channels = dropdims(Symbol.(data["channellabels"]),dims=1),
+       )
 
-return averaged_data_array
+    return averaged_data_array
 
 end
 
