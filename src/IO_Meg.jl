@@ -28,10 +28,11 @@ function load_besa_av(file_name)
     averaged_data  = data["data"]["amplitudes"]
 
     averaged_data_array= wrapdims(
-       averaged_data,
-       time = dropdims(data["data"]["latencies"],dims=1),
-       channels = dropdims(Symbol.(data["channellabels"]),dims=1),
-       )
+        averaged_data,
+        time = dropdims(data["data"]["latencies"],dims=1),
+        #WARNING: last channel called REF is being indexed out
+        channels = Symbol.(data["channellabels"][1:351])
+    )
 
     return averaged_data_array
 
