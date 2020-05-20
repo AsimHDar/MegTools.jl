@@ -193,16 +193,13 @@ function load_BSepochs(subject_path::String)
         # Removing bad trials
         n_trials = length(to_read) - length(intersect(bad_trials, to_read))
         stacked_epochs = Array{Float64}(undef, total_timepoints, n_channels, n_trials)
+        clean_trials = setdiff(to_read, bad_trials)
 
         # Bundling together all the trials in a single array
-        for (idx, trial) in enumerate(to_read)
-
-            if trial ∈ bad_trials  # Go to next trial if it belongs to the bad trials list
-                continue
-            end
+        for (idx, trial) in enumerate(clean_trials)
 
             trial_data = matread(trial)["F"]' # F is the label given to the data
-            stacked_epochs[:,:,idx] = trial_data
+            stacked_epochs[:,:,idx] = trial_data .* 10^15 # Converting from tesla to femto tesla
 
         end
 
