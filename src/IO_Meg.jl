@@ -157,16 +157,16 @@ function load_BSepochs(subject_path::String)
 
     # Switch working directory to the location of the subjects data
     # TODO: Correct to actual file structure as designated by Brainstorm
-    cd(subject_path)
+    path = subject_path
 
     # Collecting all unique conditions present
-    dir_contents = readdir()
+    dir_contents = readdir(path)
 
     # Getting channel Data
-    channel_labels = matread("channel_vectorview306_acc1.mat")["Channel"]["Name"]
+    channel_labels = matread(joinpath(path,"channel_vectorview306_acc1.mat"))["Channel"]["Name"]
 
     # Getting names of bad trials
-    bad_trials = matread("brainstormstudy.mat")["BadTrials"]
+    bad_trials = matread(joinpath(path,"brainstormstudy.mat"))["BadTrials"]
 
     # Getting epoch files
     epoch_files = filter(x -> x[1:4] == "data", dir_contents)
@@ -186,7 +186,7 @@ function load_BSepochs(subject_path::String)
 
         # WARNING: This assumes that there are not more than 99 epoch_conditions
         to_read = filter( x-> split(x, "_")[2] == condition, epoch_files)
-        trial_full = matread(to_read[1]) # Contains all sorts of metadata + signal data
+        trial_full = matread(joinpath(path,to_read[1])) # Contains all sorts of metadata + signal data
         one_trial = trial_full["F"]' # Reading signal data to get expected dimentions
         total_timepoints = size(one_trial, 1)
         n_channels = size(one_trial, 2)
@@ -198,7 +198,7 @@ function load_BSepochs(subject_path::String)
         # Bundling together all the trials in a single array
         for (idx, trial) in enumerate(clean_trials)
 
-            trial_data = matread(trial)["F"]' # F is the label given to the data
+            trial_data = matread(joinpath(path,trial))["F"]' # F is the label given to the data
             stacked_epochs[:,:,idx] = trial_data .* 10^15 # Converting from tesla to femto tesla
 
         end
