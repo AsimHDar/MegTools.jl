@@ -218,7 +218,7 @@ with the following entires: `["left_peak_erf"],["left_peak_value"], ["left_peak_
 ["right_peak_value"], ["left_channel_label"], ["right_peak_latency"], ["right_channel_label"] `
 
 """
-function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
+function find_peaks(data::Dict, left_hem_channels, right_hem_channels; peak_range=(50,150))
 
     peaks = Dict()
     for (condition, cond_data) in data
@@ -254,19 +254,21 @@ end
 
     collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
 
-Collects the peaks (the maximum value) of the left and right ERF of all conditions present
+Collects the peaks (the maximum value and their latencies) of the left and right ERF of all conditions present
 in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
 by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
 trigger values.
 
-Returns in the following format: `soi, left_amps, right_amps`
+Returns in the following format: `soi, left_amps, left_lats, right_amps, right_lats`
 """
 function collect_peaks(peaks::Dict; cond_trigger_vals=load_trigger_values("regsoi"))
-    soi, left_amps, right_amps = [], [], []
+    soi, left_amps, right_amps, left_lats, right_lats = [], [], [], [], []
     for (condition,value) in peaks
         push!(soi, cond_trigger_vals[condition])
         push!(left_amps, value["left_peak_value"])
         push!(right_amps, value["right_peak_value"])
+        push!(left_lats, value["left_peak_latency"])
+        push!(right_lats, value["right_peak_latency"])
 
     end
 
@@ -276,5 +278,5 @@ function collect_peaks(peaks::Dict; cond_trigger_vals=load_trigger_values("regso
     left_amps  = left_amps[soi_idx]
     right_amps = right_amps[soi_idx]
 
-    return soi, left_amps, right_amps
+    return soi, left_amps, left_lats, right_amps, right_lats
 end
