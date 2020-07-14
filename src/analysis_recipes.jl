@@ -195,7 +195,7 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     right_peak_value,right_peak_idx = findmin(right_channels)
     # Reversing polarity on right channel value
     right_peak_value = abs(right_peak_value)
-    peak_channel_right= right_channels.channels[left_peak_idx[2]]
+    peak_channel_right= right_channels.channels[right_peak_idx[2]]
     # Polarity is flipped to view in the positive of the y-axis
     right_peak_erf = -data(channels = peak_channel_right)
     right_peak_latency = right_channels.time[right_peak_idx[1]]
