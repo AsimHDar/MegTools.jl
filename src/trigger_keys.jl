@@ -48,10 +48,3 @@ function load_trigger_values(experimental_paradigm::String)
     return triggers
 
 end
-
-
-a = [2,3,4,5]
-
-function dojo()
-    return a[2]=666
-end
