@@ -163,7 +163,8 @@ as Symbols. The latency window for evaluating the peak values can be set with pe
 (default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels in the following
-format: `left_peak_erf, left_peak_value, right_peak_erf, right_peak_value, peak_channel_left, peak_channel_right`
+format: `left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, right_peak_value, 
+            right_peak_latency, peak_channel_left, peak_channel_right`
 """
 function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
     # Making sure input dimentions are limited to 2 (channels and time)
@@ -186,6 +187,7 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     # Determine channel name from index and use it to extract relevent channel data
     peak_channel_left= left_channels.channels[left_peak_idx[2]]
     left_peak_erf = data(channels = peak_channel_left)
+    left_peak_latency = left_channels.time[left_peak_idx[1]]
 
     # Right ERF
     right_channels = data(channels = right_hem_channels, time = N1m_latency_range)
@@ -193,11 +195,12 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     right_peak_value,right_peak_idx = findmin(right_channels)
     # Reversing polarity on right channel value
     right_peak_value = abs(right_peak_value)
-    peak_channel_right= right_channels.channels[left_peak_idx[2]]
+    peak_channel_right= right_channels.channels[right_peak_idx[2]]
     # Polarity is flipped to view in the positive of the y-axis
     right_peak_erf = -data(channels = peak_channel_right)
+    right_peak_latency = right_channels.time[right_peak_idx[1]]
 
-    return left_peak_erf, left_peak_value, right_peak_erf, right_peak_value, peak_channel_left, peak_channel_right
+    return left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, right_peak_value, right_peak_latency, peak_channel_left, peak_channel_right
 
 end
 
@@ -211,18 +214,20 @@ as Symbols. The latency window for evaluating the peak values can be set with pe
 (default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels as a Dict
-with the following entires: `["left_peak_erf"],["left_peak_value"], ["right_peak_erf"],
-["right_peak_value"], ["left_channel_label"], ["right_channel_label"] `
+with the following entires: `["left_peak_erf"],["left_peak_value"], ["left_peak_latency"],  ["right_peak_erf"],
+["right_peak_value"], ["left_channel_label"], ["right_peak_latency"], ["right_channel_label"] `
 
 """
-function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
+function find_peaks(data::Dict, left_hem_channels, right_hem_channels; peak_range=(50,150))
 
     peaks = Dict()
     for (condition, cond_data) in data
         left_peak_erf,
         left_peak_value,
+        left_peak_latency,
         right_peak_erf,
         right_peak_value,
+        right_peak_latency,
         peak_channel_left,
         peak_channel_right = find_peaks(
             cond_data,
@@ -233,8 +238,10 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_rang
         peaks[condition] = Dict()
         peaks[condition]["left_peak_erf"]  = left_peak_erf
         peaks[condition]["left_peak_value"]  = left_peak_value
+        peaks[condition]["left_peak_latency"]  = left_peak_latency
         peaks[condition]["right_peak_erf"] = right_peak_erf
         peaks[condition]["right_peak_value"]  = right_peak_value
+        peaks[condition]["right_peak_latency"]  = right_peak_latency
         peaks[condition]["left_channel_label"]  = peak_channel_left
         peaks[condition]["right_channel_label"] = peak_channel_right
     end
@@ -247,19 +254,21 @@ end
 
     collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
 
-Collects the peaks (the maximum value) of the left and right ERF of all conditions present
+Collects the peaks (the maximum value and their latencies) of the left and right ERF of all conditions present
 in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
 by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
 trigger values.
 
-Returns in the following format: `soi, left_amps, right_amps`
+Returns in the following format: `soi, left_amps, left_lats, right_amps, right_lats`
 """
-function collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
-    soi, left_amps, right_amps = [], [], []
+function collect_peaks(peaks::Dict; cond_trigger_vals=load_trigger_values("regsoi"))
+    soi, left_amps, right_amps, left_lats, right_lats = [], [], [], [], []
     for (condition,value) in peaks
         push!(soi, cond_trigger_vals[condition])
         push!(left_amps, value["left_peak_value"])
         push!(right_amps, value["right_peak_value"])
+        push!(left_lats, value["left_peak_latency"])
+        push!(right_lats, value["right_peak_latency"])
 
     end
 
@@ -268,6 +277,8 @@ function collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regso
     soi = soi[soi_idx]
     left_amps  = left_amps[soi_idx]
     right_amps = right_amps[soi_idx]
+    left_lats  = left_lats[soi_idx]
+    right_lats = right_lats[soi_idx]
 
-    return soi, left_amps, right_amps
+    return soi, left_amps, left_lats, right_amps, right_lats
 end

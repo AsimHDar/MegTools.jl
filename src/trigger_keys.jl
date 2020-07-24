@@ -25,10 +25,26 @@ function load_trigger_values(experimental_paradigm::String)
         "20" => "Noise",
     )
 
+    elseif experimental_paradigm == "soistream"
+        # Keys (in ms) and time of soi (s)
+        triggers = Dict(
+        "250" => 0.25,
+        "500" => 0.5,
+        "750" => 0.75,
+        "1000" => 1.0,
+        "1500" => 1.5,
+        "2000" => 2.0,
+        "3000" => 3.0,
+        "4000" => 4.0,
+        "5000" => 5.0,
+        "7000" => 7.0,
+    )
+
 
 
     else
     @error "Experimental paradigm not found, make yours and add it into src/triggerkeys.jl"
     end
-return triggers
+    return triggers
+
 end
