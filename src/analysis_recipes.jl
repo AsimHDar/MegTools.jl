@@ -277,6 +277,8 @@ function collect_peaks(peaks::Dict; cond_trigger_vals=load_trigger_values("regso
     soi = soi[soi_idx]
     left_amps  = left_amps[soi_idx]
     right_amps = right_amps[soi_idx]
+    left_lats  = left_lats[soi_idx]
+    right_lats = right_lats[soi_idx]
 
     return soi, left_amps, left_lats, right_amps, right_lats
 end
