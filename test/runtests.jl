@@ -147,4 +147,7 @@ end
     catch
         @test 1==1 #statating that an error is occuring
     end
+    triggers = load_trigger_values("soistream")
+    @test triggers isa Dict
+    @test length(triggers) == 10
 end
