@@ -7,6 +7,6 @@
 [![Codecov](https://codecov.io/gh/ElectronicTeaCup/MegTools.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/ElectronicTeaCup/MegTools.jl)
 [![Coveralls](https://coveralls.io/repos/github/ElectronicTeaCup/MegTools.jl/badge.svg?branch=master)](https://coveralls.io/github/ElectronicTeaCup/MegTools.jl?branch=master)
 
-
-
-![logo](images/erphead.svg)
+<img align="right" width="350" height="350" src="images/erphead.svg">
+A set of tools to make processing MEG data from Brainstorm `.mat` files an easier ordeal. 
+Not intended for public use.
