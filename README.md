@@ -1,4 +1,4 @@
-# MegTools
+# MegTools.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ElectronicTeaCup.github.io/MegTools.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ElectronicTeaCup.github.io/MegTools.jl/dev)
@@ -7,6 +7,6 @@
 [![Codecov](https://codecov.io/gh/ElectronicTeaCup/MegTools.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/ElectronicTeaCup/MegTools.jl)
 [![Coveralls](https://coveralls.io/repos/github/ElectronicTeaCup/MegTools.jl/badge.svg?branch=master)](https://coveralls.io/github/ElectronicTeaCup/MegTools.jl?branch=master)
 
-
-
-<img src="https://vignette.wikia.nocookie.net/family-guy-the-quest-for-stuff/images/a/a2/Facespace_portrait_meggriffin_default%404x.png/revision/latest/scale-to-width-down/340?cb=20140420142402" width="250"><img src="https://www.rifco.asia/wp-content/uploads/2018/09/icon_tools.jpg" height="200" width="200">
+<img align="right" width="350" height="350" src="images/erphead.svg">
+A set of tools to make processing MEG data from Brainstorm `.mat` files an easier ordeal. 
+Not intended for public use.
