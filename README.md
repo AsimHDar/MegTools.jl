@@ -1,4 +1,4 @@
-# MegTools
+# MegTools.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ElectronicTeaCup.github.io/MegTools.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ElectronicTeaCup.github.io/MegTools.jl/dev)
@@ -9,4 +9,4 @@
 
 
 
-<img src="https://vignette.wikia.nocookie.net/family-guy-the-quest-for-stuff/images/a/a2/Facespace_portrait_meggriffin_default%404x.png/revision/latest/scale-to-width-down/340?cb=20140420142402" width="250"><img src="https://www.rifco.asia/wp-content/uploads/2018/09/icon_tools.jpg" height="200" width="200">
+![logo](images/erphead.svg)
