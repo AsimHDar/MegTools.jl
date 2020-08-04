@@ -1,6 +1,7 @@
 module MegTools
 
 using AxisKeys
+using Infiltrator
 using LinearAlgebra
 using MAT
 using Measures
