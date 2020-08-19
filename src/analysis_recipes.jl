@@ -155,7 +155,7 @@ end
 
 """
 
-    find_peaks(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
+    find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
 
 Data contains all conditions and is a Dict (subject). Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
