@@ -90,6 +90,19 @@ end
     @test length(a) == length(averaged_trials[:,1])
     @test ndims(b) == 1
     @test length(b) == length(averaged_trials[:,1])
+    # Testing mean amplitude of the m100 peaks
+    _,l,_,r,_,_ = find_mean_amplitude(averaged_trials, left_labels, right_labels)
+    @test length(l) == 1
+    @test length(r) == 1
+    # Testing subject data will all conditions
+    averaged_trials_all = average_across_trials(test_data)
+    peak_means = find_mean_amplitude(averaged_trials_all, left_labels, right_labels)
+    @test peak_means["1"]["left_mean_amplitude"] == l
+    @test peak_means["1"]["right_mean_amplitude"] == r
+    # Testing collection of mean amplitudes
+    soi, left, right = collect_mean_amps(peak_means)
+    @test length(soi) == length(left) == length(right)
+    @test soi == sort(soi)
     # Single subject (Dict)
     subpeaks = find_peaks(subject_av, left_labels, right_labels)
     @test ndims(subpeaks["1"]["left_peak_erf"]) == 1
