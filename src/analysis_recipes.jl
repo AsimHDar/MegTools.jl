@@ -155,6 +155,35 @@ end
 
 """
 
+    collect_mean_amps(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
+
+Collects the mean amplitudes of the left and right ERF of all conditions present
+in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
+by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
+trigger values.
+
+Returns in the following format: `soi, left_mean_amps, right_mean_amps`
+"""
+function collect_mean_amps(peaks::Dict; cond_trigger_vals=load_trigger_values("regsoi"))
+    soi, left_mean_amps, right_mean_amps = Float64[], Float64[], Float64[]
+    for (condition,value) in peaks
+        push!(soi, cond_trigger_vals[condition])
+        push!(left_mean_amps, value["left_mean_amplitude"])
+        push!(right_mean_amps, value["right_mean_amplitude"])
+
+    end
+
+    # Sorting the output so that a line can be made from the plots
+    soi_idx = sortperm(soi)
+    soi = soi[soi_idx]
+    left_mean_amps  = left_mean_amps[soi_idx]
+    right_mean_amps = right_mean_amps[soi_idx]
+
+    return soi, left_mean_amps, right_mean_amps
+end
+
+"""
+
     find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
 
 Data contains all conditions and is a Dict (subject). Finds the channels containing peak values (for left and right hemisphere data sets) in
@@ -245,6 +274,40 @@ function find_mean_amplitude(data, left_hem_channels, right_hem_channels; peak_r
 
     return left_peak_erf, left_mean_amplitude, right_peak_erf, right_mean_amplitude, peak_channel_left, peak_channel_right
 
+end
+
+"""
+
+    collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
+
+Collects the peaks (the maximum value and their latencies) of the left and right ERF of all conditions present
+in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
+by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
+trigger values.
+
+Returns in the following format: `soi, left_amps, left_lats, right_amps, right_lats`
+"""
+function collect_peaks(peaks::Dict; cond_trigger_vals=load_trigger_values("regsoi"))
+    soi, left_amps, right_amps, left_lats, right_lats = 
+        Float64[], Float64[], Float64[], Float64[], Float64[]
+    for (condition,value) in peaks
+        push!(soi, cond_trigger_vals[condition])
+        push!(left_amps, value["left_peak_value"])
+        push!(right_amps, value["right_peak_value"])
+        push!(left_lats, value["left_peak_latency"])
+        push!(right_lats, value["right_peak_latency"])
+
+    end
+
+    # Sorting the output so that a line can be made from the plots
+    soi_idx = sortperm(soi)
+    soi = soi[soi_idx]
+    left_amps  = left_amps[soi_idx]
+    right_amps = right_amps[soi_idx]
+    left_lats  = left_lats[soi_idx]
+    right_lats = right_lats[soi_idx]
+
+    return soi, left_amps, left_lats, right_amps, right_lats
 end
 
 """
@@ -345,65 +408,3 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
 
 end
 
-"""
-
-    collect_peaks(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
-
-Collects the peaks (the maximum value and their latencies) of the left and right ERF of all conditions present
-in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
-by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
-trigger values.
-
-Returns in the following format: `soi, left_amps, left_lats, right_amps, right_lats`
-"""
-function collect_peaks(peaks::Dict; cond_trigger_vals=load_trigger_values("regsoi"))
-    soi, left_amps, right_amps, left_lats, right_lats = 
-        Float64[], Float64[], Float64[], Float64[], Float64[]
-    for (condition,value) in peaks
-        push!(soi, cond_trigger_vals[condition])
-        push!(left_amps, value["left_peak_value"])
-        push!(right_amps, value["right_peak_value"])
-        push!(left_lats, value["left_peak_latency"])
-        push!(right_lats, value["right_peak_latency"])
-
-    end
-
-    # Sorting the output so that a line can be made from the plots
-    soi_idx = sortperm(soi)
-    soi = soi[soi_idx]
-    left_amps  = left_amps[soi_idx]
-    right_amps = right_amps[soi_idx]
-    left_lats  = left_lats[soi_idx]
-    right_lats = right_lats[soi_idx]
-
-    return soi, left_amps, left_lats, right_amps, right_lats
-end
-
-"""
-
-    collect_mean_amps(peaks::Dict, cond_trigger_vals=load_trigger_values("regsoi"))
-
-Collects the mean amplitudes of the left and right ERF of all conditions present
-in the subject (Dict) input. It also converts soi triggers to values of the sois; as assigned
-by the `load_trigger_values(experimental_paradigm)` function. By default it loads the `regsoi`
-trigger values.
-
-Returns in the following format: `soi, left_mean_amps, right_mean_amps`
-"""
-function collect_mean_amps(peaks::Dict; cond_trigger_vals=load_trigger_values("regsoi"))
-    soi, left_mean_amps, right_mean_amps = Float64[], Float64[], Float64[]
-    for (condition,value) in peaks
-        push!(soi, cond_trigger_vals[condition])
-        push!(left_mean_amps, value["left_mean_amplitude"])
-        push!(right_mean_amps, value["right_mean_amplitude"])
-
-    end
-
-    # Sorting the output so that a line can be made from the plots
-    soi_idx = sortperm(soi)
-    soi = soi[soi_idx]
-    left_mean_amps  = left_mean_amps[soi_idx]
-    right_mean_amps = right_mean_amps[soi_idx]
-
-    return soi, left_mean_amps, right_mean_amps
-end

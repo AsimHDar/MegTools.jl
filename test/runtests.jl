@@ -103,7 +103,8 @@ end
     _,l,_,r,_,_ = find_mean_amplitude(averaged_trials, left_labels, right_labels)
     @test length(l) == 1
     @test length(r) == 1
-    @test_throws MethodError find_mean_amplitude(test_data, left_labels, right_labels)
+    #@test_throws MethodError find_mean_amplitude(test_data["1"], left_labels, right_labels)
+    @test_logs (:error, "Dimentions more than 2, average this data first.")  find_mean_amplitude(test_data["1"], left_labels, right_labels)
     @test_throws MethodError find_mean_amplitude(test_dict, left_labels, right_labels)
     # Testing subject data will all conditions
     averaged_trials_all = average_across_trials(test_data)
