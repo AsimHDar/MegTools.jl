@@ -309,11 +309,12 @@ format: `left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, righ
 function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
     # Making sure input dimentions are limited to 2 (channels and time)
     if ndims(data) > 2
+        # checking if there are multiple trials in the input data
         if size(data)[3] > 1
-            @error "Dimentions more than 2, average this data first."
+            @error "Multiple trials found, average this data first."
             return
         elseif ndims(data) > 3
-            @error "Dimentions more than 3."
+            @error "Dimentions more than 3. Unsure of the input data format"
             return
         end
     end
