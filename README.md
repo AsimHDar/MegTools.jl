@@ -8,5 +8,5 @@
 [![Coveralls](https://coveralls.io/repos/github/ElectronicTeaCup/MegTools.jl/badge.svg?branch=master)](https://coveralls.io/github/ElectronicTeaCup/MegTools.jl?branch=master)
 
 <img align="right" width="350" height="350" src="images/erphead.svg">
-A set of tools to make processing MEG data from Brainstorm `.mat` files an easier ordeal. 
+A set of tools to make processing MEG data from Brainstorm output files an easier ordeal. 
 Not intended for public use.
