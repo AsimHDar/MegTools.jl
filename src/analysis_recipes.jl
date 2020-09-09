@@ -184,11 +184,11 @@ end
 
 """
 
-    find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels, peak_range=(50,150))
+    find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels, mean_range=(50,150))
 
 Data contains all conditions and is a Dict (subject). Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
-as Symbols. The latency window for evaluating the peak values can be set with peak_range
+as Symbols. The latency window for evaluating the peak values can be set with mean_range
 (default is set to 50 < t <150)
 
 Returns the left and right peak erfs and their respective channel labels as a Dict
@@ -196,7 +196,7 @@ with the following entires: `["left_peak_erf"],["left_peak_value"], ["left_peak_
 ["right_peak_value"], ["left_channel_label"], ["right_peak_latency"], ["right_channel_label"] `
 
 """
-function find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels; peak_range=(50,150))
+function find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels; mean_range=(50,150))
 
     peaks = Dict()
     for (condition, cond_data) in data
@@ -209,7 +209,7 @@ function find_mean_amplitude(data::Dict, left_hem_channels, right_hem_channels; 
             cond_data,
             left_hem_channels,
             right_hem_channels,
-            peak_range=peak_range,
+            mean_range=mean_range,
         )
         peaks[condition] = Dict()
         peaks[condition]["left_peak_erf"]  = left_peak_erf
@@ -226,11 +226,11 @@ end
 
 """
 
-    find_mean_amplitude(data, left_hem_channels, right_hem_channels, peak_range=(50,150))
+    find_mean_amplitude(data, left_hem_channels, right_hem_channels, mean_range=(50,150))
 
 Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
-as Symbols. The latency window for evaluating the peak values can be set with peak_range
+as Symbols. The latency window for evaluating the peak values can be set with mean_range
 (default is set to 50 < t <150)
 
 Returns the left and right mean amplitudes, peak erfs and their respective channel labels  
@@ -238,7 +238,7 @@ in the following format:
 `left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, right_peak_value, 
     right_peak_latency, peak_channel_left, peak_channel_right`
 """
-function find_mean_amplitude(data, left_hem_channels, right_hem_channels; peak_range=(50,150))
+function find_mean_amplitude(data, left_hem_channels, right_hem_channels; mean_range=(50,150))
     # Making sure input dimentions are limited to 2 (channels and time)
     if ndims(data) > 2
         if size(data)[3] > 1
@@ -251,7 +251,7 @@ function find_mean_amplitude(data, left_hem_channels, right_hem_channels; peak_r
     end
 
     
-    N1m_latency_range = t -> peak_range[1] < t < peak_range[2]
+    N1m_latency_range = t -> mean_range[1] < t < mean_range[2]
     # Left ERF
     # Find index of peak value
     left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
