@@ -101,8 +101,6 @@ Returns in the following format: `selected_data, left_hem_channels, right_hem_ch
 function select_channels(data::Dict; paradigm::String="auditoryN1m")
 
     select_ch = Dict()
-    local left_hem_channels
-    local right_hem_channels
     for (condition, cond_data) in data
         select_ch[condition], left_hem_channels, right_hem_channels = select_channels(
             cond_data,
