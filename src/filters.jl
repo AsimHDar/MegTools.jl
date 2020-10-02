@@ -34,7 +34,6 @@ function highlow_butterworth_filter(
 
     # Resetting the offset
     filtered_data = filtered_data .+ mean(data, dims=1)
-    @info "New filters are alive and hopefully well!"
     return filtered_data
 
 end
