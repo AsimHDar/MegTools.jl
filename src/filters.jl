@@ -32,6 +32,9 @@ function highlow_butterworth_filter(
     high_pass_filter = digitalfilter(responsetype_high, designmethod)
     filtered_data = filtfilt(high_pass_filter, lowp_filtered_data)
 
+    # Resetting the offset
+    filtered_data = filtered_data .+ mean(data, dims=1)
+    @info "New filters are alive and hopefully well!"
     return filtered_data
 
 end
