@@ -116,18 +116,40 @@ end
 """
     baseline_correction(data; baseline_range=(-200,0))
 
-Baseline correct data (single channel or multiple channels) based on the specified range
-(default is -200 < t < 0)
+Baseline correct data (single subject—single channel or multiple channels) based on the 
+specified range (default is -200 ≤ t ≤ 0)
 
 Returns baseline corrected data (single channel or multiple channels)
 """
 function baseline_correction(data; baseline_range=(-200, 0))
 
-    baseline_latency_range = t-> baseline_range[1] < t < baseline_range[2]
+    baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
     baseline = mean(data(time = baseline_latency_range), dims=1)
     baseline_corrected_data = data .- baseline
 
     return baseline_corrected_data
+
+end
+"""
+    baseline_correction(data::Dict; baseline_range=(-200,0))
+
+Baseline correct data (single subject with one or more conditions) based on the input baseline 
+values for each channel. This is usually an averaged computed baseline from many
+conditions. For example, by using the `get_averaged_baseline` function
+
+Returns baseline corrected data (single channel or multiple channels)
+"""
+function baseline_correction(data::Dict, multichannel_baseline)
+
+    # Making a container for the baseline corrected data and then filling it up
+    baseline_corrected_data = Dict()
+    # This time we go through all the conditions
+     for (condition, cond_data) in data
+        baseline_corrected_data[condition] = cond_data .- multichannel_baseline
+    end
+    
+    return baseline_corrected_data
+
 
 end
 
@@ -135,7 +157,7 @@ end
     baseline_correction(data::Dict; baseline_range=(-200,0))
 
 Data contains all conditions and is a Dict (subject). Baseline correct data (single channel or multiple channels) based on the specified range
-(default is -200 < t < 0)
+(default is -200 ≤ t ≤ 0)
 
 Returns baseline corrected data (single channel or multiple channels) of all conditions
 """
@@ -150,6 +172,33 @@ function baseline_correction(data::Dict; baseline_range=(-200, 0))
     end
 
     return baseline_corrected_data
+
+end
+
+"""
+    baseline_correction(data::Dict; baseline_range=(-200,0))
+
+Baseline correction based on data from specified conditions.Data contains all conditions 
+and is a Dict (subject). Baseline correct data (single channel or multiple channels) based 
+on the specified range (default is -200 ≤ t ≤ 0)
+
+Returns 
+"""
+function get_averaged_baseline(data::Dict, baseline_conditions; baseline_range=(-200, 0))
+    
+    ## Determine the baseline correction amount from the conditions stated
+    # Determine total trials that we need to consider
+    total_trials = sum([size(data[condition])[3] for condition in baseline_conditions])
+    # Collect all the trials and concatenate them
+    all_trials = [data[cond] for cond in baseline_conditions]
+    all_trials = reduce((a,b)->cat(a,b, dims=3), all_trials)
+
+    # Determining the baseline value (of each channel) from all the trials
+    baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
+    averaged_trials = mean(all_trials(time = baseline_latency_range), dims=3)
+    baseline = mean(averaged_trials, dims=1)
+
+    return baseline
 
 end
 
@@ -189,7 +238,7 @@ end
 Data contains all conditions and is a Dict (subject). Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
 as Symbols. The latency window for evaluating the peak values can be set with mean_range
-(default is set to 50 < t <150)
+(default is set to 50 ≤ t ≤150)
 
 Returns the left and right peak erfs and their respective channel labels as a Dict
 with the following entires: `["left_peak_erf"],["left_peak_value"], ["left_peak_latency"],  ["right_peak_erf"],
@@ -231,7 +280,7 @@ end
 Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
 as Symbols. The latency window for evaluating the peak values can be set with mean_range
-(default is set to 50 < t <150)
+(default is set to 50 ≤ t ≤150)
 
 Returns the left and right mean amplitudes, peak erfs and their respective channel labels  
 in the following format: 
@@ -251,7 +300,7 @@ function find_mean_amplitude(data, left_hem_channels, right_hem_channels; mean_r
     end
 
     
-    N1m_latency_range = t -> mean_range[1] < t < mean_range[2]
+    N1m_latency_range = t -> mean_range[1] ≤ t ≤ mean_range[2]
     # Left ERF
     # Find index of peak value
     left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
@@ -317,7 +366,7 @@ end
 Data contains all conditions and is a Dict (subject). Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
 as Symbols. The latency window for evaluating the peak values can be set with peak_range
-(default is set to 50 < t <150)
+(default is set to 50 ≤ t ≤150)
 
 Returns the left and right peak erfs and their respective channel labels as a Dict
 with the following entires: `["left_peak_erf"],["left_peak_value"], ["left_peak_latency"],  ["right_peak_erf"],
@@ -363,7 +412,7 @@ end
 Finds the channels containing peak values (for left and right hemisphere data sets) in
 (ideally averaged) data. Channels of interest are passed into left_hem_channels and right_hem_channels
 as Symbols. The latency window for evaluating the peak values can be set with peak_range
-(default is set to 50 < t <150)
+(default is set to 50 ≤ t ≤150)
 
 Returns the left and right peak erfs and their respective channel labels in the following
 format: `left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, right_peak_value, 
@@ -383,7 +432,7 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     end
 
 
-    N1m_latency_range = t -> peak_range[1] < t < peak_range[2]
+    N1m_latency_range = t -> peak_range[1] ≤ t ≤ peak_range[2]
     # Left ERF
     # Find index of peak value
     left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
