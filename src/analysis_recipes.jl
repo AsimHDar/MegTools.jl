@@ -189,7 +189,7 @@ function get_averaged_baseline(data::Dict, baseline_conditions; baseline_range=(
     ## Determine the baseline correction amount from the conditions stated
     # Determine total trials that we need to consider
     total_trials = sum([size(data[condition])[3] for condition in baseline_conditions])
-    # Collect all the trials and concatenate them
+    # Collect all the trials of the select sois and concatenate them
     all_trials = [data[cond] for cond in baseline_conditions]
     all_trials = reduce((a,b)->cat(a,b, dims=3), all_trials)
 

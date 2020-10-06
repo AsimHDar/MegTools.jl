@@ -18,7 +18,7 @@ export load_besa_av, load_cont_epochs, load_BSepochs
 
 include("analysis_recipes.jl")
 export average_across_trials, select_channels, baseline_correction, find_peaks, collect_peaks,
-    find_mean_amplitude, collect_mean_amps
+    find_mean_amplitude, collect_mean_amps, get_averaged_baseline
 
 
 include("filters.jl")
