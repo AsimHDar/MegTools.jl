@@ -89,6 +89,20 @@ end
     not_filtered_1 =  test_data["1"][:,:,1]
     baseline_corrected_1 = baseline_correction(not_filtered_1)
     @test baseline_corrected[:,:,1] == baseline_corrected_1
+    # Testing with input baseline_condiitons (averaging approach as in Zacharias 2011)
+    baseline_candidates= ["4","1"]
+    averaged_baseline = get_averaged_baseline(test_data, baseline_candidates)
+    @test size(averaged_baseline)[1] == 1
+    @test size(averaged_baseline)[3] == 1 
+    @test size(averaged_baseline)[2] == length(test_data["1"].channels)
+    # Carrying out the baseline correction using the averaging method 
+    # Checking that the baselines are different
+    av_baseline_corrected = baseline_correction(test_data, averaged_baseline)
+    per_erf_baseline = baseline_correction(test_data)
+    @test av_baseline_corrected ≠ per_erf_baseline
+    # However, they are should be the same shape
+    @test length(av_baseline_corrected) == length(per_erf_baseline)
+    @test size(av_baseline_corrected["1"]) == size(per_erf_baseline["1"])
     # Testing find find_peaks
     a,_,_,b,_,_,c,d = find_peaks(averaged_trials, left_labels, right_labels)
     @test ndims(a) == 1
