@@ -124,10 +124,10 @@ Returns baseline corrected data (single channel or multiple channels)
 function baseline_correction(data; baseline_range=(-200, 0))
 
     baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
-    baseline = mean(data(time = baseline_latency_range), dims=1)
-    baseline_corrected_data = data .- baseline
+    individual_baseline = mean(data(time = baseline_latency_range), dims=1)
+    baseline_corrected_data = data .- individual_baseline
 
-    return baseline_corrected_data
+    return baseline_corrected_data, individual_baseline
 
 end
 """
@@ -145,7 +145,11 @@ function baseline_correction(data::Dict, multichannel_baseline)
     baseline_corrected_data = Dict()
     # This time we go through all the conditions
      for (condition, cond_data) in data
-        baseline_corrected_data[condition] = cond_data .- multichannel_baseline
+        baseline_corrected_data[condition] = (
+            cond_data .-  
+            multichannel_baseline(channels=cond_data.channels)
+        )
+        baseline_corrected_data[condition] = dropdims(baseline_corrected_data[condition],dims=3)
     end
     
     return baseline_corrected_data
@@ -164,14 +168,15 @@ Returns baseline corrected data (single channel or multiple channels) of all con
 function baseline_correction(data::Dict; baseline_range=(-200, 0))
 
     baseline_corrected_data = Dict()
+    individual_baseline = Dict()
     for (condition, cond_data) in data
-        baseline_corrected_data[condition] = baseline_correction(
+        baseline_corrected_data[condition], individual_baseline[condition] = baseline_correction(
             cond_data,
             baseline_range=baseline_range,
         )
     end
 
-    return baseline_corrected_data
+    return baseline_corrected_data, individual_baseline
 
 end
 
@@ -197,7 +202,6 @@ function get_averaged_baseline(data::Dict, baseline_conditions; baseline_range=(
     baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
     averaged_trials = mean(all_trials(time = baseline_latency_range), dims=3)
     baseline = mean(averaged_trials, dims=1)
-
     return baseline
 
 end
@@ -399,6 +403,7 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels; peak_rang
         peaks[condition]["right_peak_latency"]  = right_peak_latency
         peaks[condition]["left_channel_label"]  = peak_channel_left
         peaks[condition]["right_channel_label"] = peak_channel_right
+        @info " For soi $condition left channel is $peak_channel_left and right is $peak_channel_right"
     end
 
     return peaks
