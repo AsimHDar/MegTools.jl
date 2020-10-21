@@ -149,7 +149,9 @@ function baseline_correction(data::Dict, multichannel_baseline)
             cond_data .-  
             multichannel_baseline(channels=cond_data.channels)
         )
-        baseline_corrected_data[condition] = dropdims(baseline_corrected_data[condition],dims=3)
+        
+        # Not sure why this line was entered
+        #baseline_corrected_data[condition] = dropdims(baseline_corrected_data[condition],dims=3)
     end
     
     return baseline_corrected_data

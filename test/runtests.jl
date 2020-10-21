@@ -76,18 +76,18 @@ end
     @test auditory_channels.channels == vcat(left_labels, right_labels)
     # Testing baseline_correction
     filtered = highlow_butterworth_filter(auditory_channels, 1000)
-    baseline_corrected = baseline_correction(filtered)
+    baseline_corrected, individual_baseline = baseline_correction(filtered)
     @test filtered ≠ baseline_corrected
     @test sum(baseline_corrected) < sum(filtered)
     # Single subject (Dict)
-    baseline_corrected = baseline_correction(test_data)
+    baseline_corrected, _ = baseline_correction(test_data)
     @test test_data["1"] ≠ baseline_corrected["1"]
     @test sum(baseline_corrected["1"]) < sum(test_data["1"])
     # Determine if robust with different number of total trials
     not_filtered =  test_data["1"]
-    baseline_corrected = baseline_correction(not_filtered)
+    baseline_corrected, _ = baseline_correction(not_filtered)
     not_filtered_1 =  test_data["1"][:,:,1]
-    baseline_corrected_1 = baseline_correction(not_filtered_1)
+    baseline_corrected_1, _ = baseline_correction(not_filtered_1)
     @test baseline_corrected[:,:,1] == baseline_corrected_1
     # Testing with input baseline_condiitons (averaging approach as in Zacharias 2011)
     baseline_candidates= ["4","1"]
@@ -98,7 +98,7 @@ end
     # Carrying out the baseline correction using the averaging method 
     # Checking that the baselines are different
     av_baseline_corrected = baseline_correction(test_data, averaged_baseline)
-    per_erf_baseline = baseline_correction(test_data)
+    per_erf_baseline, _ = baseline_correction(test_data)
     @test av_baseline_corrected ≠ per_erf_baseline
     # However, they are should be the same shape
     @test length(av_baseline_corrected) == length(per_erf_baseline)
