@@ -119,15 +119,21 @@ end
 Baseline correct data (single subject—single channel or multiple channels) based on the 
 specified range (default is -200 ≤ t ≤ 0)
 
-Returns baseline corrected data (single channel or multiple channels)
+Returns baseline corrected data (single channel or multiple channels) and if `output_baseline`
+is set to `true` then it also returns the individual baseline
 """
-function baseline_correction(data; baseline_range=(-200, 0))
+function baseline_correction(data; baseline_range=(-200, 0), output_baseline=false)
 
     baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
     individual_baseline = mean(data(time = baseline_latency_range), dims=1)
     baseline_corrected_data = data .- individual_baseline
 
-    return baseline_corrected_data, individual_baseline
+    if output_baseline == true
+        return baseline_corrected_data, individual_baseline
+    else
+        return baseline_corrected_data 
+        
+    end
 
 end
 """
@@ -165,20 +171,34 @@ end
 Data contains all conditions and is a Dict (subject). Baseline correct data (single channel or multiple channels) based on the specified range
 (default is -200 ≤ t ≤ 0)
 
-Returns baseline corrected data (single channel or multiple channels) of all conditions
+Returns baseline corrected data (single channel or multiple channels) of all conditions and
+if `output_baseline` is set to `true` then it also returns the individual baselines
 """
-function baseline_correction(data::Dict; baseline_range=(-200, 0))
+function baseline_correction(data::Dict; baseline_range=(-200, 0), output_baseline=false)
 
     baseline_corrected_data = Dict()
     individual_baseline = Dict()
-    for (condition, cond_data) in data
-        baseline_corrected_data[condition], individual_baseline[condition] = baseline_correction(
-            cond_data,
-            baseline_range=baseline_range,
-        )
-    end
 
-    return baseline_corrected_data, individual_baseline
+
+    if output_baseline == true
+        for (condition, cond_data) in data
+            baseline_corrected_data[condition], individual_baseline[condition] = baseline_correction(
+                cond_data,
+                baseline_range=baseline_range,
+            )
+        end
+
+        return baseline_corrected_data, individual_baseline
+    else
+        for (condition, cond_data) in data
+            baseline_corrected_data[condition] = baseline_correction(
+                cond_data,
+                baseline_range=baseline_range,
+            )
+        end
+
+        return baseline_corrected_data 
+    end
 
 end
 
