@@ -70,10 +70,10 @@ end
         paradigm="auditoryN1m",
     )
      # Select INCORRECT paradigm from subject (Dict)
-    @test_throws MethodError auditory_channels,left_labels,right_labels = select_channels(
-        test_data,
-        paradigm="HamSandwich",
-    )
+    # @test_throws MethodError auditory_channels,left_labels,right_labels = select_channels(
+    #     test_data,
+    #     paradigm="HamSandwich",
+    # )
     @test size(auditory_channels["1"])[2] ==  (length(left_labels) + length(right_labels))
     @test auditory_channels["1"].channels == vcat(left_labels, right_labels)
     # Same with averaged trial, which is of a single condition
@@ -210,11 +210,11 @@ end
     triggers = load_trigger_values("regsoi")
     @test triggers isa Dict
     @test length(triggers) == 20
-    try
-        load_trigger_values("MyUnknownProject")
-    catch
-        @test 1==1 #statating that an error is occuring
-    end
+    # try
+    #     load_trigger_values("MyUnknownProject")
+    # catch
+    #     @test 1==1 #statating that an error is occuring
+    # end
     triggers = load_trigger_values("soistream")
     @test triggers isa Dict
     @test length(triggers) == 10
