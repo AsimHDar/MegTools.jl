@@ -37,9 +37,16 @@ end
 
 Select specific channels of interest to be processed for analysis. It selects
 channel names based on the available paradigms and returns data from channels, as well as
-the labels of the channels. The default paradigm is set to auditoryN1m. For manual selection
-use the paradigm `select_channels` and input the channels as positional arguments as
-arrays of strings.
+the labels of the channels. The default paradigm is set to auditoryN1m. For custom selection
+use the paradigm `custom_channels` and input the channels as positional arguments as
+arrays of strings, or as a single channel string e.g.
+
+average_filtered_auditory, auditory_left, auditory_right = select_channels(
+    average,
+    paradigm="custom_channels",
+    left_channels=["MEG0241", "MEG0231"],
+    right_channels=["MEG2641",]
+)
 
 Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
@@ -123,7 +130,7 @@ function select_channels(data::Dict; paradigm::String="auditoryN1m", left_channe
 end
 
 """
-    baseline_correction(data; baseline_range=(-200,0))
+    baseline_correction(data; baseline_range=(-200,0), output_baseline=false)
 
 Baseline correct data (single subject—single channel or multiple channels) based on the 
 specified range (default is -200 ≤ t ≤ 0)
