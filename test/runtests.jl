@@ -55,6 +55,15 @@ end
     )
     @test size(auditory_channels)[2] ==  (length(left_labels) + length(right_labels))
     @test auditory_channels.channels == vcat(left_labels, right_labels)
+    # Selecting custom channels
+    custom_channels, custom_left, custom_right = select_channels(
+        test_data["1"],
+        paradigm="custom_channels",
+        left_channels=["MEG0241", "MEG0231"],
+        right_channels="MEG2641"
+    )
+    @test length(custom_channels.channels) == 3
+    @test length([custom_left;custom_right]) == 3
     # Select from subject (Dict)
     auditory_channels,left_labels,right_labels = select_channels(
         test_data,
@@ -83,6 +92,12 @@ end
     baseline_corrected = baseline_correction(test_data)
     @test test_data["1"] ≠ baseline_corrected["1"]
     @test sum(baseline_corrected["1"]) < sum(test_data["1"])
+    # Getting the baseline value (using averaged data (all trials))
+    baseline_corrected, indv_baseline = baseline_correction(averaged_trials, output_baseline = true)
+    @test length(indv_baseline) == length(averaged_trials.channels)
+    # Now checking a dict of subjects
+    baseline_corrected, indv_baseline = baseline_correction(test_data, output_baseline = true)
+    @test size(indv_baseline["1"]) == (1,319,100) # (time, channels, trials)
     # Determine if robust with different number of total trials
     not_filtered =  test_data["1"]
     baseline_corrected = baseline_correction(not_filtered)
@@ -109,6 +124,20 @@ end
     @test length(a) == length(averaged_trials[:,1])
     @test ndims(b) == 1
     @test length(b) == length(averaged_trials[:,1])
+    # Testing custom channel with find peaks
+    
+    custom_channels2, custom_left2, custom_right2 = select_channels(
+        averaged_trials,
+        paradigm="custom_channels",
+        left_channels=["MEG0241", ],
+        right_channels=["MEG2641", ]
+    )
+    a,_,_,b,_,_,c,d = find_peaks(custom_channels2, custom_left2, custom_right2)
+    @test ndims(a) == 1
+    @test length(a) == length(averaged_trials[:,1])
+    @test ndims(b) == 1
+    @test length(b) == length(averaged_trials[:,1])
+
     # Testing find_peaks with incorrect dimentions
     @test_throws MethodError a,_,_,b,_,_,c,d = find_peaks(test_data, left_labels, right_labels)
     test_dict = Dict("fake_array"=>rand(10,10,1,10))

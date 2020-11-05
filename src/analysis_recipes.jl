@@ -182,7 +182,7 @@ function baseline_correction(data::Dict, multichannel_baseline)
 end
 
 """
-    baseline_correction(data::Dict; baseline_range=(-200,0))
+    baseline_correction(data::Dict; baseline_range=(-200,0), output_baseline=false)
 
 Data contains all conditions and is a Dict (subject). Baseline correct data (single channel or multiple channels) based on the specified range
 (default is -200 ≤ t ≤ 0)
@@ -201,6 +201,7 @@ function baseline_correction(data::Dict; baseline_range=(-200, 0), output_baseli
             baseline_corrected_data[condition], individual_baseline[condition] = baseline_correction(
                 cond_data,
                 baseline_range=baseline_range,
+                output_baseline=output_baseline
             )
         end
 
