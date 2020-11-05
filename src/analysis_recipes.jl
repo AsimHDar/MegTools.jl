@@ -37,14 +37,21 @@ end
 
 Select specific channels of interest to be processed for analysis. It selects
 channel names based on the available paradigms and returns data from channels, as well as
-the labels of the channels. The default paradigm is set to auditoryN1m.
+the labels of the channels. The default paradigm is set to auditoryN1m. For manual selection
+use the paradigm `select_channels` and input the channels as positional arguments as
+arrays of strings.
 
 Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
-function select_channels(data; paradigm::String="auditoryN1m")
+function select_channels(data; paradigm::String="auditoryN1m", left_channels=[], right_channels=[])
 # This paradigm selects channels based on the ones that appear most active during auditory
 # stimuli of repeating nature
-    if paradigm == "auditoryN1m"
+    if paradigm== "custom_channels"
+        
+        right_hem_ch = right_channels
+        left_hem_ch  = left_channels
+
+    elseif paradigm == "auditoryN1m"
         right_hem_ch = [
             "MEG1131",
             "MEG1341",
@@ -98,7 +105,7 @@ the labels of the channels. The default paradigm is set to auditoryN1m.
 
 Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
-function select_channels(data::Dict; paradigm::String="auditoryN1m")
+function select_channels(data::Dict; paradigm::String="auditoryN1m", left_channels=[], right_channels=[])
 
     select_ch = Dict()
     local left_hem_channels
@@ -107,6 +114,8 @@ function select_channels(data::Dict; paradigm::String="auditoryN1m")
         select_ch[condition], left_hem_channels, right_hem_channels = select_channels(
             cond_data,
             paradigm=paradigm,
+            left_channels=left_channels,
+            right_channels=right_channels,
         )
     end
 
@@ -465,21 +474,47 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
     left_peak_value,left_peak_idx = findmax(left_channels)
     # Determine channel name from index and use it to extract relevent channel data
-    peak_channel_left= left_channels.channels[left_peak_idx[2]]
-    left_peak_erf = data(channels = peak_channel_left)
-    left_peak_latency = left_channels.time[left_peak_idx[1]]
-
+    # The three states below are based on the input of the channel names if they
+    # are 1. Array of channels, 2. A symbol 3. An array with a single Symbol
+    
+    if left_hem_channels isa Array && length(left_hem_channels) > 1
+        peak_channel_left= left_channels.channels[left_peak_idx[2]]
+        left_peak_erf = data(channels = peak_channel_left)
+        left_peak_latency = left_channels.time[left_peak_idx[1]]
+    elseif left_hem_channels isa Symbol
+        peak_channel_left = left_hem_channels
+        left_peak_erf =  data(channels = left_hem_channels)
+        left_peak_latency = left_channels.time[left_peak_idx]
+    elseif left_hem_channels isa Array
+        peak_channel_left = left_hem_channels[1]
+        left_peak_erf =  data(channels = left_hem_channels)
+        left_peak_latency = left_channels.time[left_peak_idx]
+    end
+    
     # Right ERF
     right_channels = data(channels = right_hem_channels, time = N1m_latency_range)
     # Right side activity is negative, and so minimum is the "peak" value
     right_peak_value,right_peak_idx = findmin(right_channels)
     # Reversing polarity on right channel value
     right_peak_value = abs(right_peak_value)
-    peak_channel_right= right_channels.channels[right_peak_idx[2]]
-    # Polarity is flipped to view in the positive of the y-axis
-    right_peak_erf = -data(channels = peak_channel_right)
-    right_peak_latency = right_channels.time[right_peak_idx[1]]
-
+    
+    if right_hem_channels isa Array && length(right_hem_channels) > 1
+        peak_channel_right= right_channels.channels[right_peak_idx[2]]
+        # Polarity is flipped to view in the positive of the y-axis
+        right_peak_erf = -data(channels = peak_channel_right)
+        right_peak_latency = right_channels.time[right_peak_idx[1]]
+    elseif right_hem_channels isa Symbol
+        peak_channel_right= right_hem_channels
+        # Polarity is flipped to view in the positive of the y-axis
+        right_peak_erf = -data(channels = right_hem_channels)
+        right_peak_latency = right_channels.time[right_peak_idx]
+    elseif right_hem_channels isa Array
+        peak_channel_right= right_hem_channels[1]
+        # Polarity is flipped to view in the positive of the y-axis
+        right_peak_erf = -data(channels = right_hem_channels)
+        right_peak_latency = right_channels.time[right_peak_idx]
+    end
+    
     return left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, right_peak_value, right_peak_latency, peak_channel_left, peak_channel_right
 
 end
