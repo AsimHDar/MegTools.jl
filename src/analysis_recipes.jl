@@ -37,14 +37,28 @@ end
 
 Select specific channels of interest to be processed for analysis. It selects
 channel names based on the available paradigms and returns data from channels, as well as
-the labels of the channels. The default paradigm is set to auditoryN1m.
+the labels of the channels. The default paradigm is set to auditoryN1m. For custom selection
+use the paradigm `custom_channels` and input the channels as positional arguments as
+arrays of strings, or as a single channel string e.g.
+
+average_filtered_auditory, auditory_left, auditory_right = select_channels(
+    average,
+    paradigm="custom_channels",
+    left_channels=["MEG0241", "MEG0231"],
+    right_channels=["MEG2641",]
+)
 
 Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
-function select_channels(data; paradigm::String="auditoryN1m")
+function select_channels(data; paradigm::String="auditoryN1m", left_channels=[], right_channels=[])
 # This paradigm selects channels based on the ones that appear most active during auditory
 # stimuli of repeating nature
-    if paradigm == "auditoryN1m"
+    if paradigm== "custom_channels"
+        
+        right_hem_ch = right_channels
+        left_hem_ch  = left_channels
+
+    elseif paradigm == "auditoryN1m"
         right_hem_ch = [
             "MEG1131",
             "MEG1341",
@@ -98,7 +112,7 @@ the labels of the channels. The default paradigm is set to auditoryN1m.
 
 Returns in the following format: `selected_data, left_hem_channels, right_hem_channels`
 """
-function select_channels(data::Dict; paradigm::String="auditoryN1m")
+function select_channels(data::Dict; paradigm::String="auditoryN1m", left_channels=[], right_channels=[])
 
     select_ch = Dict()
     local left_hem_channels
@@ -107,6 +121,8 @@ function select_channels(data::Dict; paradigm::String="auditoryN1m")
         select_ch[condition], left_hem_channels, right_hem_channels = select_channels(
             cond_data,
             paradigm=paradigm,
+            left_channels=left_channels,
+            right_channels=right_channels,
         )
     end
 
@@ -114,20 +130,26 @@ function select_channels(data::Dict; paradigm::String="auditoryN1m")
 end
 
 """
-    baseline_correction(data; baseline_range=(-200,0))
+    baseline_correction(data; baseline_range=(-200,0), output_baseline=false)
 
 Baseline correct data (single subject—single channel or multiple channels) based on the 
 specified range (default is -200 ≤ t ≤ 0)
 
-Returns baseline corrected data (single channel or multiple channels)
+Returns baseline corrected data (single channel or multiple channels) and if `output_baseline`
+is set to `true` then it also returns the individual baseline
 """
-function baseline_correction(data; baseline_range=(-200, 0))
+function baseline_correction(data; baseline_range=(-200, 0), output_baseline=false)
 
     baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
-    baseline = mean(data(time = baseline_latency_range), dims=1)
-    baseline_corrected_data = data .- baseline
+    individual_baseline = mean(data(time = baseline_latency_range), dims=1)
+    baseline_corrected_data = data .- individual_baseline
 
-    return baseline_corrected_data
+    if output_baseline == true
+        return baseline_corrected_data, individual_baseline
+    else
+        return baseline_corrected_data 
+        
+    end
 
 end
 """
@@ -145,7 +167,13 @@ function baseline_correction(data::Dict, multichannel_baseline)
     baseline_corrected_data = Dict()
     # This time we go through all the conditions
      for (condition, cond_data) in data
-        baseline_corrected_data[condition] = cond_data .- multichannel_baseline
+        baseline_corrected_data[condition] = (
+            cond_data .-  
+            multichannel_baseline(channels=cond_data.channels)
+        )
+        
+        # Not sure why this line was entered
+        #baseline_corrected_data[condition] = dropdims(baseline_corrected_data[condition],dims=3)
     end
     
     return baseline_corrected_data
@@ -154,24 +182,40 @@ function baseline_correction(data::Dict, multichannel_baseline)
 end
 
 """
-    baseline_correction(data::Dict; baseline_range=(-200,0))
+    baseline_correction(data::Dict; baseline_range=(-200,0), output_baseline=false)
 
 Data contains all conditions and is a Dict (subject). Baseline correct data (single channel or multiple channels) based on the specified range
 (default is -200 ≤ t ≤ 0)
 
-Returns baseline corrected data (single channel or multiple channels) of all conditions
+Returns baseline corrected data (single channel or multiple channels) of all conditions and
+if `output_baseline` is set to `true` then it also returns the individual baselines
 """
-function baseline_correction(data::Dict; baseline_range=(-200, 0))
+function baseline_correction(data::Dict; baseline_range=(-200, 0), output_baseline=false)
 
     baseline_corrected_data = Dict()
-    for (condition, cond_data) in data
-        baseline_corrected_data[condition] = baseline_correction(
-            cond_data,
-            baseline_range=baseline_range,
-        )
-    end
+    individual_baseline = Dict()
 
-    return baseline_corrected_data
+
+    if output_baseline == true
+        for (condition, cond_data) in data
+            baseline_corrected_data[condition], individual_baseline[condition] = baseline_correction(
+                cond_data,
+                baseline_range=baseline_range,
+                output_baseline=output_baseline
+            )
+        end
+
+        return baseline_corrected_data, individual_baseline
+    else
+        for (condition, cond_data) in data
+            baseline_corrected_data[condition] = baseline_correction(
+                cond_data,
+                baseline_range=baseline_range,
+            )
+        end
+
+        return baseline_corrected_data 
+    end
 
 end
 
@@ -197,7 +241,6 @@ function get_averaged_baseline(data::Dict, baseline_conditions; baseline_range=(
     baseline_latency_range = t-> baseline_range[1] ≤ t ≤ baseline_range[2]
     averaged_trials = mean(all_trials(time = baseline_latency_range), dims=3)
     baseline = mean(averaged_trials, dims=1)
-
     return baseline
 
 end
@@ -399,6 +442,7 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels; peak_rang
         peaks[condition]["right_peak_latency"]  = right_peak_latency
         peaks[condition]["left_channel_label"]  = peak_channel_left
         peaks[condition]["right_channel_label"] = peak_channel_right
+        @info " For soi $condition left channel is $peak_channel_left and right is $peak_channel_right"
     end
 
     return peaks
@@ -438,21 +482,47 @@ function find_peaks(data, left_hem_channels, right_hem_channels, peak_range=(50,
     left_channels = data(channels = left_hem_channels, time = N1m_latency_range)
     left_peak_value,left_peak_idx = findmax(left_channels)
     # Determine channel name from index and use it to extract relevent channel data
-    peak_channel_left= left_channels.channels[left_peak_idx[2]]
-    left_peak_erf = data(channels = peak_channel_left)
-    left_peak_latency = left_channels.time[left_peak_idx[1]]
-
+    # The three states below are based on the input of the channel names if they
+    # are 1. Array of channels, 2. A symbol 3. An array with a single Symbol
+    
+    if left_hem_channels isa Array && length(left_hem_channels) > 1
+        peak_channel_left= left_channels.channels[left_peak_idx[2]]
+        left_peak_erf = data(channels = peak_channel_left)
+        left_peak_latency = left_channels.time[left_peak_idx[1]]
+    elseif left_hem_channels isa Symbol
+        peak_channel_left = left_hem_channels
+        left_peak_erf =  data(channels = left_hem_channels)
+        left_peak_latency = left_channels.time[left_peak_idx]
+    elseif left_hem_channels isa Array
+        peak_channel_left = left_hem_channels[1]
+        left_peak_erf =  data(channels = left_hem_channels)
+        left_peak_latency = left_channels.time[left_peak_idx]
+    end
+    
     # Right ERF
     right_channels = data(channels = right_hem_channels, time = N1m_latency_range)
     # Right side activity is negative, and so minimum is the "peak" value
     right_peak_value,right_peak_idx = findmin(right_channels)
     # Reversing polarity on right channel value
     right_peak_value = abs(right_peak_value)
-    peak_channel_right= right_channels.channels[right_peak_idx[2]]
-    # Polarity is flipped to view in the positive of the y-axis
-    right_peak_erf = -data(channels = peak_channel_right)
-    right_peak_latency = right_channels.time[right_peak_idx[1]]
-
+    
+    if right_hem_channels isa Array && length(right_hem_channels) > 1
+        peak_channel_right= right_channels.channels[right_peak_idx[2]]
+        # Polarity is flipped to view in the positive of the y-axis
+        right_peak_erf = -data(channels = peak_channel_right)
+        right_peak_latency = right_channels.time[right_peak_idx[1]]
+    elseif right_hem_channels isa Symbol
+        peak_channel_right= right_hem_channels
+        # Polarity is flipped to view in the positive of the y-axis
+        right_peak_erf = -data(channels = right_hem_channels)
+        right_peak_latency = right_channels.time[right_peak_idx]
+    elseif right_hem_channels isa Array
+        peak_channel_right= right_hem_channels[1]
+        # Polarity is flipped to view in the positive of the y-axis
+        right_peak_erf = -data(channels = right_hem_channels)
+        right_peak_latency = right_channels.time[right_peak_idx]
+    end
+    
     return left_peak_erf, left_peak_value, left_peak_latency, right_peak_erf, right_peak_value, right_peak_latency, peak_channel_left, peak_channel_right
 
 end
