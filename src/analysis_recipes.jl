@@ -442,7 +442,7 @@ function find_peaks(data::Dict, left_hem_channels, right_hem_channels; peak_rang
         peaks[condition]["right_peak_latency"]  = right_peak_latency
         peaks[condition]["left_channel_label"]  = peak_channel_left
         peaks[condition]["right_channel_label"] = peak_channel_right
-        #@info " For soi $condition left channel is $peak_channel_left and right is $peak_channel_right"
+        @info " For soi $condition left channel is $peak_channel_left and right is $peak_channel_right"
     end
 
     return peaks
