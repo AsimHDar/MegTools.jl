@@ -64,6 +64,15 @@ end
     )
     @test length(custom_channels.channels) == 3
     @test length([custom_left;custom_right]) == 3
+        # Selecting custom channels 
+        custom_channels, custom_left, custom_right = select_channels(
+            test_data["1"],
+            paradigm="custom_channels",
+            left_channels=["MEG0241", "MEG0231"],
+            right_channels="MEG2641"
+        )
+        @test length(custom_channels.channels) == 3
+        @test length([custom_left;custom_right]) == 3
     # Select from subject (Dict)
     auditory_channels,left_labels,right_labels = select_channels(
         test_data,
@@ -133,6 +142,18 @@ end
         right_channels=["MEG2641", ]
     )
     a,_,_,b,_,_,c,d = find_peaks(custom_channels2, custom_left2, custom_right2)
+    @test ndims(a) == 1
+    @test length(a) == length(averaged_trials[:,1])
+    @test ndims(b) == 1
+    @test length(b) == length(averaged_trials[:,1])
+ # Testing with singular non-array input
+    custom_channels3, custom_left3, custom_right3 = select_channels(
+        averaged_trials,
+        paradigm="custom_channels",
+        left_channels="MEG0241",
+        right_channels="MEG2641"
+    )
+    a,_,_,b,_,_,c,d = find_peaks(custom_channels3, custom_left3, custom_right3)
     @test ndims(a) == 1
     @test length(a) == length(averaged_trials[:,1])
     @test ndims(b) == 1
