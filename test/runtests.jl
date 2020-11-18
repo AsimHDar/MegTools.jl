@@ -145,7 +145,7 @@ end
     # Making sure we only have a single channel in the output
     @test size(a)[2] == 1
     @test length(a) == length(averaged_trials[:,1])
-    @test size(b)[2) == 1
+    @test size(b)[2] == 1
     @test length(b) == length(averaged_trials[:,1])
  # Testing with singular non-array input
     custom_channels3, custom_left3, custom_right3 = select_channels(
