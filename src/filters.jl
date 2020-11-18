@@ -7,7 +7,8 @@ Applies a high and low-pass filter of butterworth design (n pole 5). For alterin
 threshold values for filters, change add keyword arguments low_pass for low pass filter cut-off
 (default=30) and high_pass for high-pass cut-off (default=1). To change the nth order
 of the butterworth filter, use keyword bw_n_pole (default=5). Offset due to filtering at 0z,
-i.e the mean of the time series, can be turned off by setting `offset=false`
+i.e the mean of the time series, can be turned off by setting `offset=false` which
+manually adds back the offset
 
 Returns filtered data
 """
