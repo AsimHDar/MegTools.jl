@@ -142,9 +142,10 @@ end
         right_channels=["MEG2641", ]
     )
     a,_,_,b,_,_,c,d = find_peaks(custom_channels2, custom_left2, custom_right2)
-    @test ndims(a) == 1
+    # Making sure we only have a single channel in the output
+    @test size(a)[2] == 1
     @test length(a) == length(averaged_trials[:,1])
-    @test ndims(b) == 1
+    @test size(b)[2) == 1
     @test length(b) == length(averaged_trials[:,1])
  # Testing with singular non-array input
     custom_channels3, custom_left3, custom_right3 = select_channels(
