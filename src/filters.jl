@@ -1,12 +1,13 @@
 using DSP
 
 """
-    highlow_butterworth_filter(data,sampling_rate; low_pass=30, high_pass=1, bw_n_pole=5)
+    highlow_butterworth_filter(data,sampling_rate; low_pass=30, high_pass=1, bw_n_pole=5, offset=true)
 
 Applies a high and low-pass filter of butterworth design (n pole 5). For altering the
 threshold values for filters, change add keyword arguments low_pass for low pass filter cut-off
 (default=30) and high_pass for high-pass cut-off (default=1). To change the nth order
-of the butterworth filter, use keyword bw_n_pole (default=5).
+of the butterworth filter, use keyword bw_n_pole (default=5). Offset due to filtering at 0z,
+i.e the mean of the time series, can be turned off by setting `offset=false`
 
 Returns filtered data
 """
@@ -15,6 +16,7 @@ function highlow_butterworth_filter(
     low_pass=30,
     high_pass=1,
     bw_n_pole=5,
+    offset = true,
 )
 
 # Setting up low-pass filter properties
@@ -32,9 +34,11 @@ function highlow_butterworth_filter(
     high_pass_filter = digitalfilter(responsetype_high, designmethod)
     filtered_data = filtfilt(high_pass_filter, lowp_filtered_data)
 
-    # Resetting the offset
-    filtered_data = filtered_data .+ mean(data, dims=1)
-    return filtered_data
+    if offset == false
+        # Resetting the offset
+        filtered_data = filtered_data .+ mean(data, dims=1)
+    end
+        return filtered_data
 
 end
 
@@ -53,6 +57,7 @@ function highlow_butterworth_filter(
     low_pass=30,
     high_pass=1,
     bw_n_pole=5,
+    offset=true
 )
 
     filtered_data = Dict()
@@ -63,6 +68,7 @@ function highlow_butterworth_filter(
             low_pass=low_pass,
             high_pass=high_pass,
             bw_n_pole=bw_n_pole,
+            offset=offset,
         )
     end
 

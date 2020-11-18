@@ -209,7 +209,9 @@ end
         paradigm="auditoryN1m",
     )
     filtered = highlow_butterworth_filter(auditory_channels, 1000)
+    filtered_nooffset = highlow_butterworth_filter(auditory_channels, 1000, offset=false)
     @test filtered ≠ auditory_channels
+    @test filtered ≠ filtered_nooffset
     @test size(filtered) == size(auditory_channels)
     @test filtered.channels == vcat(left_labels, right_labels)
     # Subject (Dict)
@@ -222,6 +224,11 @@ end
     for (cond, data) in filtered
         @test filtered[cond]  ≠ auditory_channels[cond] && size(filtered[cond]) == size(auditory_channels[cond])
         @test filtered[cond].channels == vcat(left_labels, right_labels)
+    end
+    filtered_nooffset = highlow_butterworth_filter(auditory_channels, 1000, offset=false)
+    for (cond, data) in filtered
+        @test filtered_nooffset[cond]  ≠ filtered[cond] && size(filtered_nooffset[cond]) == size(filtered[cond])
+        @test filtered_nooffset[cond].channels == vcat(left_labels, right_labels)
     end
 
 end
