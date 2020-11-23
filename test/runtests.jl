@@ -142,9 +142,10 @@ end
         right_channels=["MEG2641", ]
     )
     a,_,_,b,_,_,c,d = find_peaks(custom_channels2, custom_left2, custom_right2)
-    @test ndims(a) == 1
+    # Making sure we only have a single channel in the output
+    @test size(a)[2] == 1
     @test length(a) == length(averaged_trials[:,1])
-    @test ndims(b) == 1
+    @test size(b)[2] == 1
     @test length(b) == length(averaged_trials[:,1])
  # Testing with singular non-array input
     custom_channels3, custom_left3, custom_right3 = select_channels(
@@ -209,7 +210,9 @@ end
         paradigm="auditoryN1m",
     )
     filtered = highlow_butterworth_filter(auditory_channels, 1000)
+    filtered_nooffset = highlow_butterworth_filter(auditory_channels, 1000, offset=false)
     @test filtered ≠ auditory_channels
+    @test filtered ≠ filtered_nooffset
     @test size(filtered) == size(auditory_channels)
     @test filtered.channels == vcat(left_labels, right_labels)
     # Subject (Dict)
@@ -222,6 +225,11 @@ end
     for (cond, data) in filtered
         @test filtered[cond]  ≠ auditory_channels[cond] && size(filtered[cond]) == size(auditory_channels[cond])
         @test filtered[cond].channels == vcat(left_labels, right_labels)
+    end
+    filtered_nooffset = highlow_butterworth_filter(auditory_channels, 1000, offset=false)
+    for (cond, data) in filtered
+        @test filtered_nooffset[cond]  ≠ filtered[cond] && size(filtered_nooffset[cond]) == size(filtered[cond])
+        @test filtered_nooffset[cond].channels == vcat(left_labels, right_labels)
     end
 
 end
