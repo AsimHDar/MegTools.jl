@@ -208,6 +208,7 @@ function load_BSepochs(subject_path::String)
         stacked_epochs = wrapdims(
            stacked_epochs,
            # Time is converted to ms (from seconds) to ms
+           # This also means that epoch selection should always be integers in proprocessing
            time = round.(Int, trial_full["Time"][:] * 1000),
            channels = dropdims(Symbol.(channel_labels), dims=1),
            trials = 1:n_trials,
