@@ -207,8 +207,8 @@ function load_BSepochs(subject_path::String)
         # Converting the array into an AxisKeys Array for better indexing
         stacked_epochs = wrapdims(
            stacked_epochs,
-           # Time is converted to ms (from seconds) and rounded to 5 sig digits
-           time = round.(trial_full["Time"][:] * 1000, digits = 5),
+           # Time is converted to ms (from seconds) to ms
+           time = round.(Int, trial_full["Time"][:] * 1000),
            channels = dropdims(Symbol.(channel_labels), dims=1),
            trials = 1:n_trials,
            )
