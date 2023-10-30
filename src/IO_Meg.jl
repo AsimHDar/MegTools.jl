@@ -170,6 +170,9 @@ function load_BSepochs(subject_path::String)
 
     # Getting epoch files
     epoch_files = filter(x -> x[1:4] == "data", dir_contents)
+    # The trials have a specific keyword trial
+    epoch_files = filter(contains("trial"), epoch_files)
+    
     epoch_conditions = Vector{String}(undef, length(epoch_files))
     for (idx, file) in enumerate(epoch_files)
 
