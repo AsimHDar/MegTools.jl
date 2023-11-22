@@ -1,22 +1,21 @@
 using Documenter, MegTools
 
-makedocs(;
+makedocs(
     modules=[MegTools],
     format=Documenter.HTML(),
     pages=[
         "Home" => "index.md",
         "DocStrings" => "functions.md",
         "Simple Pipeline" => "pipelines/testingpreproc.md",
-
     ],
-    repo="https://github.com/AsimHDar/MegTools.jl/blob/{commit}{path}#L{line}",
     sitename="MegTools.jl",
     authors="Asim H. Dar",
-    assets=String[],
 )
 
-deploydocs(;
-    repo="github.com/AsimHDar/MegTools.jl",
+deploydocs(
+    repo="github.com/AsimHDar/MegTools.jl.git",
+    target="build",
+    push_preview=true,
 )
 
     
