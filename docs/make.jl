@@ -16,6 +16,8 @@ deploydocs(
     repo="github.com/AsimHDar/MegTools.jl.git",
     target="build",
     push_preview=true,
+    versions = nothing,
+    devbranch = "develop"
 )
 
     
